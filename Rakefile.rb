@@ -1,5 +1,5 @@
 
-@files = %w{ vimrc zshrc gemrc gitconfig}
+@files = %w{ vimrc zshrc gemrc gitconfig tmux.config}
 
 task :install do 
   @files.each do |file_name|
