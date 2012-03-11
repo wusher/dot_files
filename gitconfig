@@ -1,8 +1,6 @@
 [user]
 	name = Will Usher
 	email = willusher+github@gmail.com
-
-  
 [color]
   ui = always 
 [alias]
@@ -22,7 +20,6 @@
     noff = merge --no-ff
     l = log --pretty=oneline --abbrev-commit --graph --decorate 
     lol = log --graph --abbrev-commit --date=relative --oneline --decorate
-    
     la = !git l --all
     div = divergence
     gn = goodness
@@ -31,7 +28,7 @@
     pom = push origin master
     b = branch
 [core]
-	quotepath = false
+  quotepath = false
   editor = '/usr/bin/vim'
 
 
