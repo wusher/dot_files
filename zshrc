@@ -10,17 +10,18 @@ PATH=/usr/texbin:$PATH
 PATH=/usr/local/mysql/bin:$PATH
 
 alias path='echo -e ${PATH//:/\\n}'
-alias gvim=mvim
 alias raket='rake environment RAILS_ENV=test '
 alias wip='rake cucumber:wip'
 alias ctt='ct thredUP3'
-alias vim='mvim -v'
-alias vi='mvim -v'
 alias gsp='git smart-pull'
 alias gsm='git smart-merge'
 alias gsl='git smart-log'
 alias chromedebug='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security'
+alias 'unicorn start'=unicorn_rails 
 
+
+
+# lsof -wni tcp:8090"
 export EDITOR='mvim -v'
 
 # Set name of the theme to load.
@@ -54,13 +55,18 @@ source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
 # RVM
-[[ -s '/Users/maudite/.rvm/scripts/rvm' ]] && source '/Users/maudite/.rvm/scripts/rvm'
+[[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
-# RVM
-[[ -s '/Users/maudite/.rvm/scripts/rvm' ]] && source '/Users/maudite/.rvm/scripts/rvm'
 
 #tmuxinator
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
 
+
+function resetData {
+  sudo mysql --execute="CREATE DATABASE ${1:-thredup3_development}"
+  gzip -d ./tmp/thredup.sql.gz
+  sudo mysql ${1:-thredup3_development} < ${2:-./tmp/thredup.sql}
+}
+  
 
 alias ".."="cd .."

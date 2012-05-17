@@ -28,12 +28,12 @@ set gfn=Monaco:h12
 
 "solarized
 set background=dark
-let g:solarized_termtrans=1
-let g:solarized_termcolors=256
-let g:solarized_contrast="high"
-let g:solarized_visibility="high"
+"let g:solarized_termtrans=1
+"let g:solarized_termcolors=256
+"let g:solarized_contrast="high"
+"let g:solarized_visibility="high"
 "zed's: moria, kib_darktango, native, ps_color, pyte, zenburn 
-colorscheme solarized "summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
+colorscheme Tomorrow-Night-Bright "summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
 
 "always try to show syntax 
 syntax on 
@@ -128,6 +128,7 @@ set smartcase
 set incsearch
 set hlsearch
 nnoremap <leader><space> :noh<cr>
+nnoremap <leader><CR> :%s/\r/\r/g<cr>
 
 "show invisiable chars 
 "set list 
@@ -169,8 +170,10 @@ inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
-nnoremap <C-}> tabnext<cr> 
-nnoremap <C-{> tabprevious<cr> 
+nnoremap <leader>0 :tabnext<cr> 
+nnoremap <leader>9 :tabprevious<cr> 
+nnoremap <C-t> :tabnew<cr> 
+
 
 
 " bindings for the rim refractor plugin 
@@ -190,4 +193,8 @@ nnoremap <C-{> tabprevious<cr>
 noremap <leader>o <Esc>:CommandT<CR>
 noremap <leader>i <Esc>:CommandTBuffer<CR>
 noremap <leader>m <Esc>:CommandTFlush<CR>
+
+
+
+noremap <leader>t <Esc>:!mate %:p<CR>
 
