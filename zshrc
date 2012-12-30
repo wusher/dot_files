@@ -6,13 +6,19 @@ ZSH=$HOME/.oh-my-zsh
 
 PATH=/Developer/usr/bin:$PATH
 PATH=/usr/local/bin:$PATH
+PATH=/usr/local/sbin:$PATH
 PATH=/usr/texbin:$PATH
 PATH=/usr/local/mysql/bin:$PATH
+PATH=~/bin:$PATH
 
 alias path='echo -e ${PATH//:/\\n}'
 alias raket='rake environment RAILS_ENV=test '
 alias wip='rake cucumber:wip'
-alias ctt='ct thredUP3'
+alias ctt='cw tup/thredUP3/'
+alias cde='cw tup-erp/'
+alias cdo='cw tup-ops/'
+alias cdp='cw tup-photos/'
+alias cdw='cw WarehouseProcessing/'
 alias gsp='git smart-pull'
 alias gsm='git smart-merge'
 alias gsl='git smart-log'
@@ -20,9 +26,19 @@ alias chromedebug='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrom
 alias 'unicorn start'=unicorn_rails 
 
 
+#rmagick fixes 
+#export MAGICK_HOME=/usr/local/Cellar/imagemagick/6.7.7-6
+export PATH=/usr/local/Cellar/imagemagick/6.7.7-6/include/ImageMagick/wand:$PATH
+export PATH=/usr/local/Cellar/imagemagick/6.7.7-6/include/ImageMagick/magick:$PATH
+#export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/git/bin:/usr/local/ImageMagick-6.7.1/bin:$PATH
+#export DYLD_LIBRARY_PATH=/usr/local/ImageMagick-6.7.1/lib
 
 # lsof -wni tcp:8090"
 export EDITOR='mvim -v'
+
+
+#everything is vim!!!
+set -o vi 
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -39,7 +55,7 @@ ZSH_THEME="mine"
 # DISABLE_AUTO_UPDATE="true"
 
 # Uncomment following line if you want to disable colors in ls
-DISABLE_LS_COLORS="true"
+DISABLE_LS_COLORS="false"
 
 # Uncomment following line if you want to disable autosetting terminal title.
 DISABLE_AUTO_TITLE="true"
