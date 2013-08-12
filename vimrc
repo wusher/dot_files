@@ -21,16 +21,20 @@ set gfn=Ubuntu\ Mono:h14
 "solarized
 set background=dark
 "zed's: moria, kib_darktango, native, ps_color, pyte, zenburn 
-colorscheme molokai "Tomorrow-Night-Bright  summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
+"Tomorrow-Night-Bright  summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
+colorscheme wombat256
 
 "always try to show syntax 
 syntax on 
+
+"http://stackoverflow.com/questions/677986/vim-copy-selection-to-os-x-clipboard
+set clipboard=unnamed
 
 
 
 " status information
 set laststatus=2
-set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
+"set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
 " set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
 " set statusline=%<%f\ (%{&ft})\ %-4(%m%)%=%-19(%3l,%02c%03V%)
 :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=red
@@ -38,7 +42,7 @@ set ruler "show the cursor position all the time "
 set showcmd
 
 " highlight current line 
-set cursorline
+set nocursorline
 set cmdheight=1
 
 
@@ -49,6 +53,16 @@ set guioptions-=r
 " Store temporary files in a central spot
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+
+" needed for running vim with zsh
+set shell=/bin/sh
+
+
+
+" add mouse scrolling to command line vim http://stackoverflow.com/questions/7225057/use-mouse-scroll-wheel-in-vim
+set mouse=a
+map <ScrollWheelUp> <C-Y>
+map <ScrollWheelDown> <C-E>
 
 
 
@@ -101,7 +115,6 @@ if has("autocmd")
   autocmd bufwritepost .vimrc source $MYVIMRC
 endif 
 "make it easier to edit vim
-nmap <leader>v :tabedit $MYVIMRC<CR>
 
 "map the ; to the : key
 nore ; :
@@ -119,6 +132,8 @@ set hlsearch
 nnoremap <leader><space> :noh<cr>
 nnoremap <leader><CR> :%s/\r/\r/g<cr>
 
+
+
 "show invisiable chars 
 "set list 
 "set listchars=tab:▸\ ,eol:¬
@@ -135,32 +150,48 @@ noremap <space> za
 vnoremap <space> zf
 
 "rails commands 
-nnoremap <leader>m :Rmodel<cr>
-nnoremap <leader>c :Rcontroller<cr>
-nnoremap <leader>h :Rview<cr>
-nnoremap <leader>ra :AV<cr>
-nnoremap <leader>av :AV<cr>
+"nnoremap <leader>m :Rmodel<cr>
+"nnoremap <leader>c :Rcontroller<cr>
+"nnoremap <leader>h :Rview<cr>
+"nnoremap <leader>ra :AV<cr>
+"nnoremap <leader>av :AV<cr>
 
+" open markdown file in marked.app 
+"  http://captainbollocks.tumblr.com/post/9858989188/linking-macvim-and-marked-app
+nnoremap <leader>m <Esc>:silent !open -a Marked.app '%:p'<CR>
+
+
+
+"rspec commands
+nnoremap <leader>r :!rspec %<cr>
+vnoremap <leader>r :!rspec %<cr>
+
+"rspec commands
+nnoremap <leader>c :!clear && make %:r && ./%:r<cr>
+vnoremap <leader>c :!clear && make %:r && ./%:r<cr>
+
+nnoremap <leader>v :!clear && make %:r && valgrind ./%:r<cr>
+vnoremap <leader>v :!clear && make %:r && valgrind ./%:r<cr>
 
 " TRAINING KEYS REMOVED
 "nnoremap <up> <nop>
 "nnoremap <down> <nop>
 "nnoremap <left> <nop>
 "nnoremap <right> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>
+inoremap <up>    :resize +10 <cr>
+inoremap <down>  :resize -10 <cr>
+inoremap <left>  :vertical resize -10 <cr>
+inoremap <right> :vertical resize +10 <cr>
 
-vmap <Left> <gv
-vmap <Right> >gv
-nmap <Left> <<
-nmap <Right> >>
+vnoremap <up>    :resize +10 <cr>
+vnoremap <down>  :resize -10 <cr>
+vnoremap <left>  :vertical resize -10 <cr>
+vnoremap <right> :vertical resize +10 <cr>
 
-nmap <Up> [e
-nmap <Down> ]e
-vmap <Up> [egv
-vmap <Down> ]egv
+nnoremap <up>    :resize +10 <cr>
+nnoremap <down>  :resize -10 <cr>
+nnoremap <left>  :vertical resize -10 <cr>
+nnoremap <right> :vertical resize +10 <cr>
 
 
 
@@ -171,6 +202,8 @@ vnoremap <F1> <ESC>
 nnoremap <leader>0 :tabnext<cr> 
 nnoremap <leader>9 :tabprevious<cr> 
 nnoremap <C-t> :tabnew<cr> 
+
+" powerline
 
 
 
@@ -193,6 +226,12 @@ let g:syntastic_check_on_open=1
 :nnoremap <leader>i <Esc>:TagbarOpenAutoClose<CR>
 let g:tagbar_left = 1
 let g:tagbar_sort = 0
+
+"vim rspec conque
+" Cmd-Shift-R for RSpec
+nmap <silent> <D-R> :call RunRspecCurrentFileConque()<CR>
+" Cmd-Shift-L for RSpec Current Line
+nmap <silent> <D-L> :call RunRspecCurrentLineConque()<CR>
 
 "nerd tree
 "nnoremap <leader>o :NERDTreeToggle<cr>
@@ -235,4 +274,6 @@ let g:tagbar_type_objc = {
 "remove trailing whitespace 
 " match Todo /\s\+$/
 :nnoremap <leader>w :%s/\s\+$//e<cr>
+
+autocmd BufRead,BufNewFile *.hbhaml setf haml
 

@@ -1,29 +1,51 @@
 [user]
-  name = Will Usher
+  name = wusher
   email = willusher+github@gmail.com
 [color]
   ui = always
 [alias]
-  b = branch
-  f = fetch --all
-  st = status --short
-  co = checkout --
-  di = diff
-  dc = diff --cached
+  b   = branch
+  f   = fetch --all
+  st  = status --short
+  co  = checkout --
+  dis = diff  --word-diff=color --word-diff-regex="[^[:space:],]+"
+  di  = diff
+  dc  = diff --cached
   cached = diff --cached
-  amend = commit --amend
-  patch = add -p
+  amend  = commit --amend
+  patch  = add -p 
   head = !git l -1
   last = show head
   undo = reset --soft HEAD~1
   unstage  = reset ;
   us  = reset ;
 
+
   l = log --pretty=oneline --abbrev-commit --graph --decorate
   la = log --pretty=oneline --abbrev-commit --graph --decorate  --all
   lad = log --pretty=oneline --abbrev-commit --graph --decorate  --all  --date=relative
+  lap = log --pretty=oneline --abbrev-commit --graph   --all --no-color --decorate
+  scrum =  log --oneline --since yesterday --author wusher
+  retro =  log --oneline --graph --since=2.weeks --author wusher --all
+
+  lme = log --oneline --abbrev-commit --graph --decorate --author wusher
+  lome = log --oneline --abbrev-commit --graph --decorate --author Will Usher
+
 
   h = !git head
+  
+  top = rev-parse --show-toplevel
+
+  #http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+  assume   = update-index --assume-unchanged
+  unassume = update-index --no-assume-unchanged
+  assumed  = "!git ls-files -v | grep ^h | cut -c 3-"
+  snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+
+
+  #spelling
+  chekcout = checkout
+
 
 [core]
   quotepath = false
@@ -32,3 +54,7 @@
 
 
 
+[init]
+	templatedir = ~/.git_template
+[diff]
+	algorithm = patience
