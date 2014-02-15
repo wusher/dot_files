@@ -85,7 +85,7 @@ COMPLETION_WAITING_DOTS="true"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(mine git brew cp brew themes  ) #bundler  rvm
+plugins=(mine git brew tmux tmuxinator vagrant) #bundler  rvm
 
 source $ZSH/oh-my-zsh.sh
 
@@ -96,6 +96,7 @@ source $ZSH/oh-my-zsh.sh
 # RVM
 [[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
+source $(brew --prefix nvm)/nvm.sh
 
 #tmuxinator
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
@@ -103,9 +104,24 @@ source $ZSH/oh-my-zsh.sh
 
 function resetData {
   sudo mysql --execute="CREATE DATABASE ${1:-operations_development}"
-  gzip -d ./tmp/thredup.sql.gz
-  sudo mysql ${1:-operations_development} < ${2:-./tmp/thredup.sql}
+  gzip -d ./tmp/${2:-db}.sql.gz
+  sudo mysql ${1:-operations_development} < ./tmp/${2:-db}.sql
 }
+
+
+function notes { 
+  grep -rin $1 /Users/maudite/Dropbox/notes
+}
+
+#http://stackoverflow.com/questions/5527676/warning-the-user-local-mysql-data-directory-is-not-owned-by-the-mysql-user
+function hard_start_sql { 
+  sudo chown -RL root:mysql /usr/local/mysql
+  sudo chown -RL mysql:mysql /usr/local/mysql/data
+  sudo /usr/local/mysql/support-files/mysql.server start
+}
+
+
+alias "fig"="cd /Volumes/fig"
   
 
 alias ".."="cd .."
