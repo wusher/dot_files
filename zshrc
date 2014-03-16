@@ -31,7 +31,8 @@ alias 'fubar'=' grep -Ev "format documentation" .rspec > tmp_file && mv tmp_file
 alias zload="source ~/.zshrc"
 alias z="zeus "
 alias zake="zeus rake "
-
+#http://viget.com/extend/level-up-your-shell-game
+#alias h?="history | grep"
 
 #rmagick fixes 
 #export MAGICK_HOME=/usr/local/Cellar/imagemagick/6.7.7-6
@@ -85,7 +86,7 @@ COMPLETION_WAITING_DOTS="true"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(mine git brew tmux tmuxinator vagrant) #bundler  rvm
+plugins=(mine mix nvm node git brew tmux tmuxinator vagrant) #bundler  rvm
 
 source $ZSH/oh-my-zsh.sh
 
@@ -108,6 +109,42 @@ function resetData {
   sudo mysql ${1:-operations_development} < ./tmp/${2:-db}.sql
 }
 
+#function runchef {
+  #knife ssh name:$1 -i ${2:-~/.ec2/id_thredupkids2} -p 35987 -x ${3:-thredup} "sudo chef-client"
+#}
+
+function runchef {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-thredup} "sudo chef-client"
+}
+
+function bluepill_restart {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege stop; bluepill --no-privilege quit; bluepill --no-privilege load /usr/local/etc/service.pill"
+}
+
+function bluepill_status {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege status"
+}
+
+function bluepill_stop {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege stop; bluepill --no-privilege quit"
+}
+
+function bluepill_start {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} " bluepill --no-privilege start"
+}
+
+function bluepill_load {
+  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} " bluepill --no-privilege load /usr/local/etc/service.pill"
+}
+
+
+function ssh_ec2 { 
+  ssh -p 35987 -i ~/.ssh/thredup-developer.pem appuser@$1
+}
+
+function ssh_old { 
+  ssh -p 35987 -i ~/.ssh/thredup-developer.pem thredup@$1
+}
 
 function notes { 
   grep -rin $1 /Users/maudite/Dropbox/notes
@@ -126,6 +163,7 @@ alias "fig"="cd /Volumes/fig"
 
 alias ".."="cd .."
 alias vim="mvim -v "
+alias marked="open -a Marked.app "
 
 function deploy {
   cap single deploy -s tag=${1}

@@ -214,6 +214,7 @@ noremap <leader>p <Esc>:CtrlPBuffer<CR>
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_match_window_reversed = 0
 let g:ctrlp_max_height = 90
+let g:ctrlp_custom_ignore = 'node_modules\|bower_components\|_build\|deps\|DS_Store\|git'
 
 
 noremap <leader>t <Esc>:!mate %:p<CR>
@@ -276,4 +277,3 @@ let g:tagbar_type_objc = {
 :nnoremap <leader>w :%s/\s\+$//e<cr>
 
 autocmd BufRead,BufNewFile *.hbhaml setf haml
-
