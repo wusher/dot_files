@@ -67,13 +67,13 @@ set -o vi
 # time that oh-my-zsh is loaded.
 #ZSH_THEME="robbyrussell"
 #ZSH_THEME="gallois"
-ZSH_THEME="mine"
+ZSH_THEME="wedisagree"
 
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
 # Comment this out to disable weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
+# DISABLE_AUTO_UPDATE="truee
 
 # Uncomment following line if you want to disable colors in ls
 DISABLE_LS_COLORS="false"
@@ -86,7 +86,7 @@ COMPLETION_WAITING_DOTS="true"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(mine mix nvm node git brew tmux tmuxinator vagrant) #bundler  rvm
+plugins=(mine mix nvm node git tmux tmuxinator vagrant) #bundler  rvm
 
 source $ZSH/oh-my-zsh.sh
 
@@ -97,7 +97,6 @@ source $ZSH/oh-my-zsh.sh
 # RVM
 [[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
-source $(brew --prefix nvm)/nvm.sh
 
 #tmuxinator
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
@@ -169,4 +168,3 @@ function deploy {
   cap single deploy -s tag=${1}
 }
 
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
