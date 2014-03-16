@@ -48,7 +48,7 @@ export PATH=/usr/local/share/npm/bin:$PATH
 #export DYLD_LIBRARY_PATH=/usr/local/ImageMagick-6.7.1/lib
 
 # lsof -wni tcp:8090"
-export EDITOR='mvim -v'
+export EDITOR='vim'
 
 # Enable Ctrl-x-e to edit command line
 autoload -U edit-command-line
@@ -161,8 +161,6 @@ alias "fig"="cd /Volumes/fig"
   
 
 alias ".."="cd .."
-alias vim="mvim -v "
-alias marked="open -a Marked.app "
 
 function deploy {
   cap single deploy -s tag=${1}
