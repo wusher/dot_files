@@ -108,41 +108,8 @@ function resetData {
   sudo mysql ${1:-operations_development} < ./tmp/${2:-db}.sql
 }
 
-#function runchef {
-  #knife ssh name:$1 -i ${2:-~/.ec2/id_thredupkids2} -p 35987 -x ${3:-thredup} "sudo chef-client"
-#}
-
 function runchef {
   knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-thredup} "sudo chef-client"
-}
-
-function bluepill_restart {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege stop; bluepill --no-privilege quit; bluepill --no-privilege load /usr/local/etc/service.pill"
-}
-
-function bluepill_status {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege status"
-}
-
-function bluepill_stop {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} "bluepill --no-privilege stop; bluepill --no-privilege quit"
-}
-
-function bluepill_start {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} " bluepill --no-privilege start"
-}
-
-function bluepill_load {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-appuser} " bluepill --no-privilege load /usr/local/etc/service.pill"
-}
-
-
-function ssh_ec2 { 
-  ssh -p 35987 -i ~/.ssh/thredup-developer.pem appuser@$1
-}
-
-function ssh_old { 
-  ssh -p 35987 -i ~/.ssh/thredup-developer.pem thredup@$1
 }
 
 function notes { 
@@ -161,6 +128,15 @@ alias "fig"="cd /Volumes/fig"
   
 
 alias ".."="cd .."
+
+# OS STUFFS
+if [ `uname` '==' "Darwin" ]; then
+  #mac things
+  alias "vim"="mvim -v"
+else
+  #linux
+  export PATH="$PATH:/home/wusher/source/elixir/bin"
+fi
 
 function deploy {
   cap single deploy -s tag=${1}

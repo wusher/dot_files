@@ -31,7 +31,6 @@ syntax on
 set clipboard=unnamed
 
 
-
 " status information
 set laststatus=2
 "set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
