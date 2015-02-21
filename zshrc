@@ -66,7 +66,7 @@ set -o vi
 # time that oh-my-zsh is loaded.
 #ZSH_THEME="robbyrussell"
 #ZSH_THEME="gallois"
-ZSH_THEME="mine"
+ZSH_THEME="wedisagree"
 
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
@@ -131,4 +131,3 @@ function deploy {
   cap single deploy -s tag=${1}
 }
 
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
