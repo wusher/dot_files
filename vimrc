@@ -1,6 +1,29 @@
-"pathogen commands 
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+
+" install vimplug https://github.com/junegunn/vim-plug#installation
+call plug#begin('~/.vim/plugged') 
+
+
+" utility
+Plug 'vim-airline/vim-airline'
+Plug 'kien/ctrlp.vim'
+Plug 'vim-scripts/Colour-Sampler-Pack'
+Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdcommenter'
+Plug 'mbbill/undotree'
+Plug 'mileszs/ack.vim'
+Plug 'majutsushi/tagbar'
+
+" editing
+Plug 'alvan/vim-closetag'
+Plug 'ervandew/supertab' 
+Plug 'Raimondi/delimitMate'
+
+" language
+Plug 'rodjek/vim-puppet'
+Plug 'vim-ruby/vim-ruby'
+Plug 'tmux-plugins/vim-tmux'
+
+call plug#end() 
 
 " turn off old school vim mode, should be first b/c it overwites some defaults 
 set nocompatible
@@ -8,21 +31,17 @@ set nocompatible
 " turn off wrap by defaults  
 set nowrap 
 
+
+
 "closetag commands 
 autocmd FileType html,htmldjango,jinjahtml,eruby,mako let b:closetag_html_style=1
 autocmd FileType html,xhtml,xml,htmldjango,jinjahtml,eruby,mako source ~/.vim/bundle/closetag/plugin/closetag.vim
 
-set gfn=Ubuntu\ Mono:h14
-
-
-"supertab commands
-"let g:SuperTabDefaultCompletionType = "context"
 
 "solarized
 set background=dark
-"zed's: moria, kib_darktango, native, ps_color, pyte, zenburn 
 "Tomorrow-Night-Bright  summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
-colorscheme wombat256
+colorscheme herald
 
 "always try to show syntax 
 syntax on 
@@ -33,16 +52,19 @@ set clipboard=unnamed
 
 " status information
 set laststatus=2
-"set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
-" set statusline=%<%f%=\ [%1*%M%*%n%R]\ y\ %-19(%3l,%02c%03V%)
-" set statusline=%<%f\ (%{&ft})\ %-4(%m%)%=%-19(%3l,%02c%03V%)
 :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=red
 set ruler "show the cursor position all the time "
 set showcmd
 
 " highlight current line 
-set nocursorline
+set cursorline
+set cursorcolumn
+highlight CursorLine   cterm=NONE ctermbg=91 ctermfg=NONE guibg=DarkBlue guifg=NONE
+highlight CursorColumn   cterm=NONE ctermbg=91 ctermfg=NONE guibg=DarkBlue guifg=NONE
+
+
 set cmdheight=1
+
 
 
 " Don't show scroll bars in the GUI
@@ -107,12 +129,12 @@ set showcmd "show partial command in status line
 
 
 "turn outo save on 
-au FocusLost * :wa
+"au FocusLost * :wa
 
 " reload the vim file 
-if has("autocmd")
-  autocmd bufwritepost .vimrc source $MYVIMRC
-endif 
+"if has("autocmd")
+  "autocmd bufwritepost .vimrc source $MYVIMRC
+"endif 
 "make it easier to edit vim
 
 "map the ; to the : key
@@ -131,6 +153,7 @@ set hlsearch
 nnoremap <leader><space> :noh<cr>
 nnoremap <leader><CR> :%s/\r/\r/g<cr>
 
+set number
 
 
 "show invisiable chars 
@@ -142,6 +165,8 @@ noremap <C-h>  <C-w>h
 noremap <C-j>  <C-w>j
 noremap <C-k>  <C-w>k
 noremap <C-l>  <C-w>l
+
+
 
 
 "easy folding 
@@ -173,10 +198,6 @@ nnoremap <leader>v :!clear && make %:r && valgrind ./%:r<cr>
 vnoremap <leader>v :!clear && make %:r && valgrind ./%:r<cr>
 
 " TRAINING KEYS REMOVED
-"nnoremap <up> <nop>
-"nnoremap <down> <nop>
-"nnoremap <left> <nop>
-"nnoremap <right> <nop>
 inoremap <up>    :resize +10 <cr>
 inoremap <down>  :resize -10 <cr>
 inoremap <left>  :vertical resize -10 <cr>
