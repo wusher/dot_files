@@ -3,6 +3,7 @@
 call plug#begin('~/.vim/plugged') 
 
 
+
 " utility
 Plug 'vim-airline/vim-airline'
 Plug 'kien/ctrlp.vim'
@@ -12,9 +13,13 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'mbbill/undotree'
 Plug 'mileszs/ack.vim'
 Plug 'majutsushi/tagbar'
+Plug 'tpope/vim-fugitive' 
+Plug 'mbbill/undotree'
+"Plug 'Valloric/YouCompleteMe' 
+
 
 " editing
-Plug 'alvan/vim-closetag'
+"Plug 'alvan/vim-closetag'
 Plug 'ervandew/supertab' 
 Plug 'Raimondi/delimitMate'
 
@@ -22,6 +27,11 @@ Plug 'Raimondi/delimitMate'
 Plug 'rodjek/vim-puppet'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tmux-plugins/vim-tmux'
+Plug 'martinda/Jenkinsfile-vim-syntax'
+Plug 'elixir-editors/vim-elixir'
+Plug 'leafgarland/typescript-vim'
+Plug 'vim-scripts/nginx.vim'
+
 
 call plug#end() 
 
@@ -34,8 +44,8 @@ set nowrap
 
 
 "closetag commands 
-autocmd FileType html,htmldjango,jinjahtml,eruby,mako let b:closetag_html_style=1
-autocmd FileType html,xhtml,xml,htmldjango,jinjahtml,eruby,mako source ~/.vim/bundle/closetag/plugin/closetag.vim
+"autocmd FileType html,htmldjango,jinjahtml,eruby,mako let b:closetag_html_style=1
+"autocmd FileType html,xhtml,xml,htmldjango,jinjahtml,eruby,mako source ~/.vim/bundle/closetag/plugin/closetag.vim
 
 
 "solarized
@@ -257,40 +267,8 @@ nmap <silent> <D-L> :call RunRspecCurrentLineConque()<CR>
 "nerd tree
 "nnoremap <leader>o :NERDTreeToggle<cr>
 
-" add a definition for Objective-C to tagbar
-let g:tagbar_type_objc = {
-    \ 'ctagstype' : 'ObjectiveC',
-    \ 'kinds'     : [
-        \ 'i:interface',
-        \ 'I:implementation',
-        \ 'p:Protocol',
-        \ 'm:Object_method',
-        \ 'c:Class_method',
-        \ 'v:Global_variable',
-        \ 'F:Object field',
-        \ 'f:function',
-        \ 'p:property',
-        \ 't:type_alias',
-        \ 's:type_structure',
-        \ 'e:enumeration',
-        \ 'M:preprocessor_macro',
-    \ ],
-    \ 'sro'        : ' ',
-    \ 'kind2scope' : {
-        \ 'i' : 'interface',
-        \ 'I' : 'implementation',
-        \ 'p' : 'Protocol',
-        \ 's' : 'type_structure',
-        \ 'e' : 'enumeration'
-    \ },
-    \ 'scope2kind' : {
-        \ 'interface'      : 'i',
-        \ 'implementation' : 'I',
-        \ 'Protocol'       : 'p',
-        \ 'type_structure' : 's',
-        \ 'enumeration'    : 'e'
-    \ }
-\ }
+"undotree
+nnoremap <F5> :UndotreeToggle<cr>
 
 "remove trailing whitespace 
 " match Todo /\s\+$/
