@@ -1,144 +1,110 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-#bashth to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
+# Path to your oh-my-zsh installation.
+export ZSH=/Users/wusher/.oh-my-zsh
 
+# Set name of the theme to load. Optionally, if you set this to "random"
+# it'll load a random theme each time that oh-my-zsh is loaded.
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+ZSH_THEME="refined"
 
-
-PATH=/Developer/usr/bin:$PATH
-PATH=/usr/local/bin:$PATH
-PATH=/usr/local/sbin:$PATH
-PATH=/usr/texbin:$PATH
-PATH=/usr/local/mysql/bin:$PATH
-PATH=~/bin:$PATH
-
-PYTHONPATH="/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
-
-alias path='echo -e ${PATH//:/\\n}'
-alias raket='rake RAILS_ENV=test '
-alias wip='rake cucumber:wip'
-alias ctt='cw tup/thredUP3/'
-alias cde='cw tup-erp/'
-alias cdo='cw tup-ops/'
-alias cdp='cw tup-photos/'
-alias cdw='cw WarehouseProcessing/'
-alias gsp='git smart-pull'
-alias gsm='git smart-merge'
-alias gsl='git smart-log'
-alias chromedebug='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security'
-alias 'unicorn start'=unicorn_rails 
-alias 'nopry'=' grep -Ev "IRB = Pry" config/environments/development.rb > tmp.rb && mv tmp.rb config/environments/development.rb'
-alias 'fubar'=' grep -Ev "format documentation" .rspec > tmp_file && mv tmp_file .rspec && echo "\n--format Fuubar" >> .rspec'
-alias zload="source ~/.zshrc"
-alias z="zeus "
-alias zake="zeus rake "
-#http://viget.com/extend/level-up-your-shell-game
-#alias h?="history | grep"
-
-#rmagick fixes 
-#export MAGICK_HOME=/usr/local/Cellar/imagemagick/6.7.7-6
-#export PATH=/usr/local/Cellar/imagemagick/6.7.7-6/include/ImageMagick/wand:$PATH
-#export PATH=/usr/local/Cellar/imagemagick/6.7.7-6/include/ImageMagick/magick:$PATH
-#export MAGICK_HOME=/usr/local/Cellar/imagemaick/6.8.0-10/lib
-export PATH=/usr/local/Cellar/imagemagick/6.8.0-10/lib:$PATH
-export PATH=/usr/local/Cellar/imagemagick/6.8.0-10/include/ImageMagick/wand:$PATH
-export PATH=/usr/local/Cellar/imagemagick/6.8.0-10/include/ImageMagick/magick:$PATH
-export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
-export PATH=/usr/local/share/npm/bin:$PATH
-#export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/git/bin:/usr/local/ImageMagick-6.7.1/bin:$PATH
-#export DYLD_LIBRARY_PATH=/usr/local/ImageMagick-6.7.1/lib
-
-# lsof -wni tcp:8090"
-export EDITOR='vim'
-
-# Enable Ctrl-x-e to edit command line
-autoload -U edit-command-line
-# Emacs style
-zle -N edit-command-line
-bindkey '^xe' edit-command-line
-bindkey '^x^e' edit-command-line
-
-
-#everything is vim!!!
-set -o vi 
-
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-#ZSH_THEME="robbyrussell"
-#ZSH_THEME="gallois"
-ZSH_THEME="wedisagree"
-
-# Set to this to use case-sensitive completion
+# Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
-# Comment this out to disable weekly auto-update checks
-# DISABLE_AUTO_UPDATE="truee
+# Uncomment the following line to use hyphen-insensitive completion. Case
+# sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
 
-# Uncomment following line if you want to disable colors in ls
-DISABLE_LS_COLORS="false"
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
 
-# Uncomment following line if you want to disable autosetting terminal title.
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
 DISABLE_AUTO_TITLE="true"
 
-# Uncomment following line if you want red dots to be displayed while waiting for completion
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(mine mix nvm node git tmux tmuxinator vagrant) #bundler  rvm
+# Add wisely, as too many plugins slow down shell startup.
+plugins=()
 
 source $ZSH/oh-my-zsh.sh
 
-# enable auto-write for vim in tmux 
-#source ~/.vim/bundle/tmux-config/tmux-autowrite/autowrite-vim.sh
+# User configuration
 
-# Customize to your needs...
-# RVM
-[[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+# export MANPATH="/usr/local/man:$MANPATH"
 
+PATH=~/bin:$PATH
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
 
-#tmuxinator
-[[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
 
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
 
-function resetData {
-  sudo mysql --execute="CREATE DATABASE ${1:-operations_development}"
-  gzip -d ./tmp/${2:-db}.sql.gz
-  sudo mysql ${1:-operations_development} < ./tmp/${2:-db}.sql
-}
-
-function runchef {
-  knife ssh ${2:-name}:$1 -i ~/.ssh/thredup-developer.pem -p 35987 -x ${3:-thredup} "sudo chef-client"
-}
-
-function notes { 
-  grep -rin $1 /Users/maudite/Dropbox/notes
-}
-
-#http://stackoverflow.com/questions/5527676/warning-the-user-local-mysql-data-directory-is-not-owned-by-the-mysql-user
-function hard_start_sql { 
-  sudo chown -RL root:mysql /usr/local/mysql
-  sudo chown -RL mysql:mysql /usr/local/mysql/data
-  sudo /usr/local/mysql/support-files/mysql.server start
-}
+# ssh
+# export SSH_KEY_PATH="~/.ssh/rsa_id"
+#source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
 
 
-alias "fig"="cd /Volumes/fig"
-  
+alias vim='mvim -v'
+alias vi='mvim -v'
 
-alias ".."="cd .."
 
-# OS STUFFS
-if [ `uname` '==' "Darwin" ]; then
-  #mac things
-  alias "vim"="mvim -v"
-else
-  #linux
-  export PATH="$PATH:/home/wusher/source/elixir/bin"
-fi
+export EDITOR=vim
 
-function deploy {
-  cap single deploy -s tag=${1}
-}
+export NVM_DIR="$HOME/.nvm"
+  . "/usr/local/opt/nvm/nvm.sh"
 
+eval $(docker-machine env default)
+
+# HACK: Disable git prompt stuff
+#function git_prompt_info() {
+   ## nop
+#}
+#function parse_git_dirty() {
+   ## nop
+#}
+#function git_prompt_status() {
+   ## nop
+#}
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+#export PATH="$PATH:$HOME/.rvm/bin"

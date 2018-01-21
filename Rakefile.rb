@@ -3,7 +3,9 @@
 
 task :install do 
   @files.each do |file_name|
-    `ln -s #{Dir.pwd}/#{file_name} ~/.#{file_name}`
+    print "linking #{file_name}\n"
+    print `ln -s #{Dir.pwd}/#{file_name} ~/.#{file_name}`
+    print "\n"
   end 
 end 
 
