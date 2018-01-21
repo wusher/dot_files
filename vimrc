@@ -5,16 +5,17 @@ call plug#begin('~/.vim/plugged')
 
 
 " utility
-Plug 'vim-airline/vim-airline'
+"Plug 'vim-airline/vim-airline'
 Plug 'kien/ctrlp.vim'
 Plug 'vim-scripts/Colour-Sampler-Pack'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/nerdcommenter'
-Plug 'mbbill/undotree'
-Plug 'mileszs/ack.vim'
+"Plug 'mbbill/undotree'
+"Plug 'mileszs/ack.vim'
 Plug 'majutsushi/tagbar'
 Plug 'tpope/vim-fugitive' 
-Plug 'mbbill/undotree'
+"Plug 'mbbill/undotree'
+Plug 'w0rp/ale'
 "Plug 'Valloric/YouCompleteMe' 
 
 
@@ -31,6 +32,7 @@ Plug 'martinda/Jenkinsfile-vim-syntax'
 Plug 'elixir-editors/vim-elixir'
 Plug 'leafgarland/typescript-vim'
 Plug 'vim-scripts/nginx.vim'
+Plug 'mustache/vim-mustache-handlebars'
 
 
 call plug#end() 
@@ -52,7 +54,15 @@ set nowrap
 set background=dark
 "Tomorrow-Night-Bright  summerfruit256 solarized native molokai herald darkz adrian no_quarter railscasts
 colorscheme herald
-
+if has("gui_running")
+  if has("gui_gtk2")
+    set guifont=Inconsolata\ 12
+  elseif has("gui_macvim")
+    set guifont=Menlo\ Regular:h18
+  elseif has("gui_win32")
+    set guifont=Consolas:h11:cANSI
+  endif
+endif
 "always try to show syntax 
 syntax on 
 
@@ -108,7 +118,7 @@ set modelines=0
 set encoding=utf-8
 
 " turn on spelling
-set spell
+"set spell
 
 " cool tab completion stuff
 set wildmenu
@@ -235,6 +245,13 @@ nnoremap <C-t> :tabnew<cr>
 
 " powerline
 
+" ale
+let g:ale_set_highlights = 0
+let g:ale_completion_enabled = 1
+let g:ale_fixers = {
+      \  'typescript': ['tslint']
+      \}
+let g:ale_fix_on_save = 1
 
 
 " control p 
@@ -244,7 +261,7 @@ noremap <leader>p <Esc>:CtrlPBuffer<CR>
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_match_window_reversed = 0
 let g:ctrlp_max_height = 90
-let g:ctrlp_custom_ignore = 'node_modules\|bower_components\|_build\|deps\|DS_Store\|git'
+let g:ctrlp_custom_ignore = 'node_modules\|bower_components\|_build\|deps\|DS_Store\|git\|blockbuster'
 
 
 noremap <leader>t <Esc>:!mate %:p<CR>
@@ -274,4 +291,4 @@ nnoremap <F5> :UndotreeToggle<cr>
 " match Todo /\s\+$/
 :nnoremap <leader>w :%s/\s\+$//e<cr>
 
-autocmd BufRead,BufNewFile *.hbhaml setf haml
+"autocmd BufRead,BufNewFile *.hbhaml setf haml
