@@ -1,6 +1,6 @@
 [user]
-  name = wusher
-  email = willusher+github@gmail.com
+	name = wusher
+	email = willusher+github@gmail.com
 [color]
   ui = always
 [alias]
@@ -65,3 +65,8 @@
 	algorithm = patience
 [help]
 	autocorrect = 1
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f

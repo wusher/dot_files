@@ -3,13 +3,13 @@
 call plug#begin('~/.vim/plugged') 
 
 
-
 " utility
 "Plug 'vim-airline/vim-airline'
 Plug 'kien/ctrlp.vim'
 Plug 'vim-scripts/Colour-Sampler-Pack'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/nerdcommenter'
+Plug '907th/vim-auto-save'
 "Plug 'mbbill/undotree'
 "Plug 'mileszs/ack.vim'
 Plug 'majutsushi/tagbar'
@@ -33,6 +33,7 @@ Plug 'elixir-editors/vim-elixir'
 Plug 'leafgarland/typescript-vim'
 Plug 'vim-scripts/nginx.vim'
 Plug 'mustache/vim-mustache-handlebars'
+Plug 'Quramy/tsuquyomi'
 
 
 call plug#end() 
@@ -202,7 +203,7 @@ vnoremap <space> zf
 
 " open markdown file in marked.app 
 "  http://captainbollocks.tumblr.com/post/9858989188/linking-macvim-and-marked-app
-nnoremap <leader>m <Esc>:silent !open -a Marked.app '%:p'<CR>
+nnoremap <leader>m <Esc>:silent !open -a 'Marked 2.app' '%:p'<CR>
 
 
 
@@ -286,6 +287,9 @@ nmap <silent> <D-L> :call RunRspecCurrentLineConque()<CR>
 
 "undotree
 nnoremap <F5> :UndotreeToggle<cr>
+
+" autosave
+let g:auto_save = 1  " enable AutoSave on Vim startup
 
 "remove trailing whitespace 
 " match Todo /\s\+$/
