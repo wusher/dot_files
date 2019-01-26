@@ -289,7 +289,7 @@ nmap <silent> <D-L> :call RunRspecCurrentLineConque()<CR>
 nnoremap <F5> :UndotreeToggle<cr>
 
 " autosave
-let g:auto_save = 1  " enable AutoSave on Vim startup
+let g:auto_save = 0  " disenable AutoSave on Vim startup
 
 "remove trailing whitespace 
 " match Todo /\s\+$/
