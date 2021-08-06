@@ -20,7 +20,7 @@
   unstage  = reset ;
   us  = reset ;
   pick = cherry-pick;
-
+  fuckit= ! git clean -d -x -f && git reset –hard
 
   l = log --pretty=oneline --abbrev-commit --graph --decorate
   la = log --pretty=oneline --abbrev-commit --graph --decorate  --all
@@ -44,6 +44,8 @@
   snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
 
   rb = ! git for-each-ref --sort=-committerdate --format='%(committerdate)%09%(refname:short)' refs/heads/  | head
+  rb20 = ! git for-each-ref --sort=-committerdate --format='%(committerdate)%09%(refname:short)' refs/heads/  | head -20
+  rb40 = ! git for-each-ref --sort=-committerdate --format='%(committerdate)%09%(refname:short)' refs/heads/  | head -40
   rbn = ! git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/  | head
   rbna = ! git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/  
   ob = ! git for-each-ref --sort=-committerdate --format='%(committerdate)%09%(refname:short)' refs/heads/  | tail

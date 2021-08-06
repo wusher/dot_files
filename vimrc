@@ -9,31 +9,52 @@ Plug 'kien/ctrlp.vim'
 Plug 'vim-scripts/Colour-Sampler-Pack'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/nerdcommenter'
-Plug '907th/vim-auto-save'
+" Plug '907th/vim-auto-save'
 "Plug 'mbbill/undotree'
 "Plug 'mileszs/ack.vim'
 Plug 'majutsushi/tagbar'
 Plug 'tpope/vim-fugitive' 
 "Plug 'mbbill/undotree'
-Plug 'w0rp/ale'
+"Plug 'w0rp/ale'
 "Plug 'Valloric/YouCompleteMe' 
+Plug 'reedes/vim-pencil'
 
 
 " editing
 "Plug 'alvan/vim-closetag'
-Plug 'ervandew/supertab' 
+"Plug 'ervandew/supertab' 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-json',
+  \ 'coc-html',
+  \ 'coc-solargraph',
+  \ 'coc-spell-checker',
+  \ 'coc-tailwindcss',
+  \ 'coc-css'
+  \ ]
+if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
+  let g:coc_global_extensions += ['coc-prettier']
+endif
+
+if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
+  let g:coc_global_extensions += ['coc-eslint']
+endif
 Plug 'Raimondi/delimitMate'
 
 " language
-Plug 'rodjek/vim-puppet'
+" Plug 'rodjek/vim-puppet'
 Plug 'vim-ruby/vim-ruby'
-Plug 'tmux-plugins/vim-tmux'
+"Plug 'tmux-plugins/vim-tmux'
 Plug 'martinda/Jenkinsfile-vim-syntax'
-Plug 'elixir-editors/vim-elixir'
+"Plug 'elixir-editors/vim-elixir'
 Plug 'leafgarland/typescript-vim'
+Plug 'pangloss/vim-javascript'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'vim-scripts/nginx.vim'
-Plug 'mustache/vim-mustache-handlebars'
-Plug 'Quramy/tsuquyomi'
+"Plug 'mustache/vim-mustache-handlebars'
+"Plug 'Quramy/tsuquyomi'
 
 
 call plug#end() 
@@ -43,6 +64,18 @@ set nocompatible
 
 " turn off wrap by defaults  
 set nowrap 
+
+
+autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
+autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
+nnoremap <silent> K :call CocAction('doHover')<CR>
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <leader>do <Plug>(coc-codeaction)
+
 
 
 
@@ -165,8 +198,8 @@ nore ; :
 let mapleader = ","
 
 "taming search 
-nnoremap / /\v
-vnoremap / /\v
+" tmp nnoremap / /\v
+" tmp vnoremap / /\v
 set ignorecase
 set smartcase
 set incsearch
