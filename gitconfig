@@ -1,8 +1,8 @@
 [user]
 	name = wusher
-  email = wusher@shutterstock.com
+	email = 149989+wusher@users.noreply.github.com
 [color]
-  ui = always
+  ui = auto
 [alias]
   b   = branch
   f   = fetch --all
@@ -30,7 +30,6 @@
   retro =  log --oneline --graph --since=2.weeks --author wusher --all
 
   lme = log --oneline --abbrev-commit --graph --decorate --author wusher
-  lome = log --oneline --abbrev-commit --graph --decorate --author Will Usher
 
 
   h = !git head
@@ -70,3 +69,5 @@
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
+[push]
+	autoSetupRemote = true
