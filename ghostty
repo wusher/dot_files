@@ -1,1 +1,18 @@
-Ghostty settings for tmux live in Ghostty config.
+# Ghostty settings needed for tmux keybindings/icons
+
+# Recommended for tmux icon rendering
+font-family = JetBrains Mono Nerd Font
+
+# Required for tmux Alt/Meta keybindings
+macos-option-as-alt = true
+keybind = alt+left=text:\x1b[1;3D
+keybind = alt+right=text:\x1b[1;3C
+keybind = alt+1=text:\x1b1
+keybind = alt+2=text:\x1b2
+keybind = alt+3=text:\x1b3
+keybind = alt+4=text:\x1b4
+keybind = alt+5=text:\x1b5
+keybind = alt+6=text:\x1b6
+keybind = alt+7=text:\x1b7
+keybind = alt+8=text:\x1b8
+keybind = alt+9=text:\x1b9
