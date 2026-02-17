@@ -1,148 +1,115 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# =============================================================================
+# OH-MY-ZSH CONFIGURATION
+# =============================================================================
 
-# If you come from bash you might havchange your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
+# Path to your oh-my-zsh installation
 export ZSH=/Users/wusher/.oh-my-zsh
 
-# Set name of the theme to load. Op $HOallyE/if you s.l this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-# ZSH_THEME="robyrussell"
-# ZSH_THEME="dst" # shows time 
-ZSH_THEME="intheloop" # shows computer name 
- 
-# ZSH_THEME="refined" # doesn't show full path 
-# ZSH_THEME="blinks" # nah it's dark 
-# ZSH_THEME="bureau" # shows ruby version and more 
-# ZSH_THEME="powerlevel10k/powerlevel10k"
+# Theme configuration
+ZSH_THEME="intheloop" # shows computer name
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the foziownit.line to use hyphen-insensicompletion. Case
-# sensitive completion must be off. _  -Uz- will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Un{+_cent the fol&&wing li _cto disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Unmme the followg line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting term \al tle.
+# Shell options
 DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to displainst cdots whilst waitingvel10timpletion.
-#COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository stcaus check for large repositories
-# much, much faster.
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
+# History configuration
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
+# Plugins
 plugins=()
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+# =============================================================================
+# PATH CONFIGURATION
+# =============================================================================
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
+# Add ~/bin to PATH
 PATH=~/bin:$PATH
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+# Add tailscale to PATH
+PATH=/usr/local/bin/tailscale:$PATH
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-#source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
+# =============================================================================
+# DEVELOPMENT TOOLS
+# =============================================================================
 
+# Ruby (rbenv)
+# eval "$(rbenv init -)"
 
-alias vim='mvim -v'
-alias vi='mvim -v'
-alias be="bundle exec"
-alias ber="bundle exec rspec "
-alias bes="bundle exec spring "
-alias besr="bundle exec spring rspec"
+# Node.js (nvm) - Homebrew version only
+#export NVM_DIR="$HOME/.nvm"
+#[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+#[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
 
 
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
 
 export EDITOR=vim
-
-
-#eval $(docker-machine env default)
-
-# HACK: Disable git prompt stuff
-#function git_prompt_info() {
-   ## nop
-#}
-#function parse_git_dirty() {
-   ## nop
-#}
-#function git_prompt_status() {
-   ## nop
-#}
-
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-#export PATH="$PATH:$HOME/.rvm/bin"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-eval "$(rbenv init -)"
+
+# =============================================================================
+# ALIASES
+# =============================================================================
+
+# Vim aliases
+alias vim='mvim -v'
+alias vi='mvim -v'
+
+# Bundle exec shortcuts
+alias be="bundle exec"
+alias ber="bundle exec rspec"
+alias bes="bundle exec spring"
+alias besr="bundle exec spring rspec"
+
+# Claude CLI
+
+# Node version switching
+alias nv='nvm use `cat .node-version`'
 
 
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+export PATH="/usr/local/bin:$PATH"
+eval "$(mise activate zsh)"
+
+# opencode
+export PATH=/Users/wusher/.opencode/bin:$PATH
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/wusher/.lmstudio/bin"
+# End of LM Studio CLI section
 
 
-# bun completions
-[ -s "/Users/wusher/.bun/_bun" ] && source "/Users/wusher/.bun/_bun"
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+# Auto-rename Zellij tabs based on directory and git branch
+_zellij_tab_name() {
+  if [[ -n "$ZELLIJ" ]]; then
+    local folder="${PWD##*/}"
+    [[ "$folder" == "" ]] && folder="/"
+    local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    local name="$folder"
+    [[ -n "$branch" ]] && name="$folder:$branch"
+    command zellij action rename-tab "$name"
+  fi
+}
+chpwd() { _zellij_tab_name }
+precmd() { _zellij_tab_name }
+export PATH="$HOME/.local/bin:$PATH"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"

@@ -32,6 +32,9 @@
   lme = log --oneline --abbrev-commit --graph --decorate --author wusher
 
 
+  test = revert --no-commit 
+
+
   h = !git head
   
   top = rev-parse --show-toplevel
@@ -71,3 +74,5 @@
 	smudge = git-lfs smudge -- %f
 [push]
 	autoSetupRemote = true
+[init]
+	defaultBranch = master
