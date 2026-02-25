@@ -54,14 +54,54 @@ def git_segment(path: str) -> str:
     porcelain = run(["git", "-C", path, "status", "--porcelain"])
     dirty = ""
     untracked = ""
+    sync = ""
     if porcelain:
         lines = porcelain.splitlines()
-        if any(not line.startswith("??") for line in lines):
-            dirty = "*"
-        if any(line.startswith("??") for line in lines):
-            untracked = "?"
+        has_staged = False
+        has_unstaged = False
+        has_untracked = False
 
-    return f" {branch}{dirty}{untracked}"
+        for line in lines:
+            if line.startswith("??"):
+                has_untracked = True
+                continue
+            if len(line) >= 2:
+                if line[0] != " ":
+                    has_staged = True
+                if line[1] != " ":
+                    has_unstaged = True
+
+        if has_staged and (has_unstaged or has_untracked):
+            dirty = " #[fg=#2ac3de]●#[fg=#e0af68]"
+        elif has_staged:
+            dirty = " #[fg=#9ece6a]●#[fg=#e0af68]"
+        elif has_unstaged or has_untracked:
+            dirty = " #[fg=#f7768e]●#[fg=#e0af68]"
+
+        if has_untracked:
+            untracked = " #[fg=#f7768e]◯#[fg=#e0af68]"
+
+    ahead = 0
+    behind = 0
+    counts = run(["git", "-C", path, "rev-list", "--left-right", "--count", "@{upstream}...HEAD"])
+    if counts:
+        parts = counts.split()
+        if len(parts) >= 2:
+            try:
+                behind = int(parts[0])
+                ahead = int(parts[1])
+            except ValueError:
+                behind = 0
+                ahead = 0
+
+    if ahead > 0 and behind > 0:
+        sync = " #[fg=#bb9af7]⇅#[fg=#e0af68]"
+    elif ahead > 0:
+        sync = " #[fg=#7aa2f7]↑#[fg=#e0af68]"
+    elif behind > 0:
+        sync = " #[fg=#e0af68]↓#[fg=#e0af68]"
+
+    return f" {branch}{dirty}{untracked}{sync}"
 
 
 def count_active_processes() -> dict[str, int]:
@@ -110,15 +150,22 @@ def battery_segment() -> str:
         
         # Extract percentage
         pct_match = re.search(r'(\d+)%', result)
-        pct = pct_match.group(1) if pct_match else "0"
+        pct = int(pct_match.group(1)) if pct_match else 0
+        pct = min(99, max(0, pct))
         
-        # Check if charging
-        is_charging = 'AC Power' in result or 'charging' in result.lower() or 'charged' in result.lower()
+        # Check if charging (avoid matching "discharging")
+        lower = result.lower()
+        is_charging = (
+            "ac power" in lower
+            or "; charging" in lower
+            or "; charged" in lower
+            or "; finishing charge" in lower
+        )
         
-        # Use only one emoji based on status
-        icon = "⚡" if is_charging else "🔋"
-        
-        return f"{icon}{pct}%"
+        if is_charging:
+            return f"⚡{pct}%"
+
+        return f"{pct}%"
     except Exception:
         return ""
 
@@ -186,6 +233,9 @@ def cpu_memory_segment() -> str:
     except Exception:
         pass
 
+    cpu_pct = min(99, max(0, cpu_pct))
+    mem_pct = min(99, max(0, mem_pct))
+
     cpu_color = "#9ece6a" if cpu_pct <= 75 else "#e0af68" if cpu_pct <= 90 else "#f7768e"
     mem_color = "#9ece6a" if mem_pct <= 70 else "#e0af68" if mem_pct <= 85 else "#f7768e"
 
@@ -246,6 +296,10 @@ def fmt_tokens(value: int) -> str:
 def compact_path(path: str) -> str:
     home = str(Path.home())
     shown = path.replace(home, "~")
+    shown = "/".join(
+        part[8:] if part.startswith("fleetio-") else part[6:] if part.startswith("fleet-") else part
+        for part in shown.split("/")
+    )
     if len(shown) <= 36:
         return shown
     return "..." + shown[-33:]
@@ -284,18 +338,18 @@ def main() -> int:
     
     output_parts = []
     
-    # Battery (if available)
-    if battery:
-        output_parts.append(f"#[fg=#9ece6a]{battery}")
-    
-    # CPU/Memory
-    output_parts.append(cpu_mem)
-    
     # Path
     output_parts.append(f"#[fg=#414868]│ #[fg=#9ece6a] {compact_path(pane_path)}")
     
     # Git
     output_parts.append(f"#[fg=#414868]│ #[fg=#e0af68]{git}")
+    
+    # Battery (if available)
+    if battery:
+        output_parts.append(f"#[fg=#414868]│ #[fg=#9ece6a]{battery}")
+    
+    # CPU/Memory
+    output_parts.append(f"#[fg=#414868]│ {cpu_mem}")
     
     # Claude usage
     output_parts.append(f"#[fg=#414868]│ #[fg=#bb9af7]󰚩 {claude_pct}%  {reset_time}")

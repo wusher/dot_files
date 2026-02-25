@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+state_file=".workstate"
+
+resolve_root() {
+  if git_root=$(git rev-parse --show-toplevel 2>/dev/null); then
+    printf "%s" "$git_root"
+  else
+    pwd
+  fi
+}
+
+write_state() {
+  local state="$1"
+  local root
+  root=$(resolve_root)
+  printf "%s\n" "$state" > "$root/$state_file"
+  printf "Set %s at %s\n" "$state" "$root/$state_file"
+}
+
+pick_state() {
+  local options
+  options=$'wip\nreview\nfeedback\nblocked\ndone'
+
+  if command -v fzf >/dev/null 2>&1; then
+    printf "%s\n" "$options" | fzf --prompt="workstate > " --height=40% --reverse
+    return
+  fi
+
+  PS3="Select workstate: "
+  select choice in wip review feedback blocked done; do
+    case "$choice" in
+      wip|review|feedback|blocked|done)
+        printf "%s\n" "$choice"
+        return
+        ;;
+      *)
+        printf "Invalid choice\n" >&2
+        ;;
+    esac
+  done
+}
+
+case "${1-}" in
+  w) write_state "wip" ;;
+  r) write_state "review" ;;
+  f) write_state "feedback" ;;
+  b) write_state "blocked" ;;
+  d) write_state "done" ;;
+  wip|review|feedback|blocked|done) write_state "$1" ;;
+  show)
+    root=$(resolve_root)
+    if [[ -f "$root/$state_file" ]]; then
+      cat "$root/$state_file"
+    fi
+    ;;
+  clear)
+    root=$(resolve_root)
+    rm -f "$root/$state_file"
+    printf "Cleared %s\n" "$root/$state_file"
+    ;;
+  "")
+    picked=$(pick_state || true)
+    if [[ -z "$picked" ]]; then
+      exit 1
+    fi
+    write_state "$picked"
+    ;;
+  *)
+    printf "Usage: ws [w|r|f|b|d|wip|review|feedback|blocked|done|show|clear]\n" >&2
+    exit 1
+    ;;
+esac
