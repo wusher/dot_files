@@ -124,7 +124,7 @@ def count_active_processes() -> dict[str, int]:
                 cpu = float(parts[2])
             except ValueError:
                 continue
-            if cpu <= 1.0:
+            if cpu <= 3.0:
                 continue
             if "claude" in lower:
                 counts["claude"] += 1
@@ -351,7 +351,7 @@ def main() -> int:
     
     # AI process count
     openai_count = process_counts["codex"] + process_counts["opencode"]
-    output_parts.append(f"#[fg=#414868]│ #[fg=#7aa2f7]🤖{openai_count}")
+    output_parts.append(f"#[fg=#414868]│ #[fg=#7aa2f7]🤖{openai_count} ")
     
     output = " ".join(output_parts)
     
