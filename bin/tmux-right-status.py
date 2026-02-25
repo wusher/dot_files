@@ -329,8 +329,6 @@ def main() -> int:
     
     # Compute git/path data
     git = git_segment(pane_path)
-    _, claude_pct = get_claude_usage()
-    reset_time = time_until_reset()
     process_counts = count_active_processes()
     
     battery = battery_segment()
@@ -351,11 +349,9 @@ def main() -> int:
     # CPU/Memory
     output_parts.append(f"#[fg=#414868]│ {cpu_mem}")
     
-    # Claude usage
-    output_parts.append(f"#[fg=#414868]│ #[fg=#bb9af7]󰚩 {claude_pct}%  {reset_time}")
-    
-    # Process counts
-    output_parts.append(f"#[fg=#414868]│ #[fg=#e0af68]{process_counts['claude']} #[fg=#7aa2f7]{process_counts['codex']} #[fg=#9ece6a]{process_counts['opencode']}")
+    # AI process count
+    openai_count = process_counts["codex"] + process_counts["opencode"]
+    output_parts.append(f"#[fg=#414868]│ #[fg=#7aa2f7]🤖{openai_count}")
     
     output = " ".join(output_parts)
     
