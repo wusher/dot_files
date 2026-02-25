@@ -93,19 +93,6 @@ export PATH="$PATH:/Users/wusher/.lmstudio/bin"
 
 
 
-# Auto-rename Zellij tabs based on directory and git branch
-_zellij_tab_name() {
-  if [[ -n "$ZELLIJ" ]]; then
-    local folder="${PWD##*/}"
-    [[ "$folder" == "" ]] && folder="/"
-    local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    local name="$folder"
-    [[ -n "$branch" ]] && name="$folder:$branch"
-    command zellij action rename-tab "$name"
-  fi
-}
-chpwd() { _zellij_tab_name }
-precmd() { _zellij_tab_name }
 export PATH="$HOME/.local/bin:$PATH"
 
 
