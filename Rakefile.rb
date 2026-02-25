@@ -1,11 +1,16 @@
 
 @files = %w[vimrc zshrc gemrc gitconfig tmux.conf]
-@dotfiles_dir = Dir.pwd
+@dotfiles_dir = File.expand_path(__dir__)
 @tmux_bin_files = %w[
   tmux-mode-pill.sh
   tmux-popup-menu.sh
   tmux-right-status.py
   tmux-workstate.py
+]
+@tmux_theme_files = %w[
+  tokyonight.conf
+  monokai.conf
+  github-light.conf
 ]
 
 task :install do
@@ -19,6 +24,15 @@ end
 task :tmux do
   print "linking tmux.conf\n"
   print `ln -sfn #{@dotfiles_dir}/tmux.conf ~/.tmux.conf`
+
+  print "ensuring ~/.tmux/themes exists\n"
+  print `mkdir -p ~/.tmux/themes`
+
+  @tmux_theme_files.each do |file_name|
+    print "linking theme #{file_name}\n"
+    print `ln -sfn #{@dotfiles_dir}/tmux/themes/#{file_name} ~/.tmux/themes/#{file_name}`
+    print "\n"
+  end
 
   print "ensuring ~/bin exists\n"
   print `mkdir -p ~/bin`
