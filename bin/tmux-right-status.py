@@ -101,7 +101,9 @@ def git_segment(path: str) -> str:
     elif behind > 0:
         sync = " #[fg=#e0af68]↓#[fg=#e0af68]"
 
-    return f" {branch}{dirty}{untracked}{sync}"
+    status = f"{dirty}{untracked}{sync}"
+    separator = " #[fg=#414868]│#[fg=#e0af68]" if status else ""
+    return f" {branch}{separator}{status}"
 
 
 def count_active_processes() -> dict[str, int]:
@@ -162,10 +164,16 @@ def battery_segment() -> str:
             or "; finishing charge" in lower
         )
         
-        if is_charging:
-            return f"⚡{pct}%"
+        if is_charging and pct < 95:
+            return f"#[fg=#e0af68]󰚥 {pct}%"
 
-        return f"{pct}%"
+        if pct < 20:
+            return f"#[fg=#ff5f87]󰁺 {pct}%"
+        if pct <= 60:
+            return f"#[fg=#bb9af7]󰁽 {pct}%"
+        if pct < 80:
+            return f"#[default]󰂁 {pct}%"
+        return f"#[default]󰁹 {pct}%"
     except Exception:
         return ""
 
@@ -236,10 +244,13 @@ def cpu_memory_segment() -> str:
     cpu_pct = min(99, max(0, cpu_pct))
     mem_pct = min(99, max(0, mem_pct))
 
-    cpu_color = "#9ece6a" if cpu_pct <= 75 else "#e0af68" if cpu_pct <= 90 else "#f7768e"
-    mem_color = "#9ece6a" if mem_pct <= 70 else "#e0af68" if mem_pct <= 85 else "#f7768e"
+    cpu_color = None if cpu_pct <= 75 else "#e0af68" if cpu_pct <= 90 else "#f7768e"
+    mem_color = None if mem_pct <= 70 else "#e0af68" if mem_pct <= 85 else "#f7768e"
 
-    return f"#[fg={cpu_color}]󰻠 {cpu_pct:02d}% #[fg={mem_color}]󰍜 {mem_pct:02d}%"
+    cpu_part = f"#[default]󰻠 {cpu_pct:02d}%" if cpu_color is None else f"#[fg={cpu_color}]󰻠 {cpu_pct:02d}%"
+    mem_part = f"#[default]󰍜 {mem_pct:02d}%" if mem_color is None else f"#[fg={mem_color}]󰍜 {mem_pct:02d}%"
+
+    return f"{cpu_part} {mem_part}"
 
 
 def time_until_reset() -> str:
@@ -294,15 +305,12 @@ def fmt_tokens(value: int) -> str:
 
 
 def compact_path(path: str) -> str:
-    home = str(Path.home())
-    shown = path.replace(home, "~")
-    shown = "/".join(
-        part[8:] if part.startswith("fleetio-") else part[6:] if part.startswith("fleet-") else part
-        for part in shown.split("/")
-    )
-    if len(shown) <= 36:
-        return shown
-    return "..." + shown[-33:]
+    name = Path(path).name or path
+    if name.startswith("fleetio-"):
+        return name[8:]
+    if name.startswith("fleet-"):
+        return name[6:]
+    return name
 
 
 def main() -> int:
@@ -341,10 +349,6 @@ def main() -> int:
     
     # Git
     output_parts.append(f"#[fg=#414868]│ #[fg=#e0af68]{git}")
-    
-    # Battery (if available)
-    if battery:
-        output_parts.append(f"#[fg=#414868]│ #[fg=#9ece6a]{battery}")
     
     # CPU/Memory
     output_parts.append(f"#[fg=#414868]│ {cpu_mem}")

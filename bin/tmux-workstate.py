@@ -9,7 +9,9 @@ STATE_FILE = ".workstate"
 STATES = {
     "wip": ("󱨎", "#9ece6a"),
     "review": ("󰔟", "#bb9af7"),
-    "feedback": ("󰚕", "#f7768e"),
+    "feedback": ("󰤉", "#ff5f87"),
+    "fixing-ci": ("󰙨", "#ff5f87"),
+    "exploring": ("󱗖", "#9ece6a"),
     "blocked": ("󰜺", "#e0af68"),
     "done": ("󰄬", "#2da44e"),
 }

@@ -20,9 +20,16 @@ write_state() {
   printf "Set %s at %s\n" "$state" "$root/$state_file"
 }
 
+clear_state() {
+  local root
+  root=$(resolve_root)
+  rm -f "$root/$state_file"
+  printf "Cleared %s\n" "$root/$state_file"
+}
+
 pick_state() {
   local options
-  options=$'wip\nreview\nfeedback\nblocked\ndone'
+  options=$'wip\nreview\nfeedback\nfixing-ci\nexploring\nblocked\ndone\nclear'
 
   if command -v fzf >/dev/null 2>&1; then
     printf "%s\n" "$options" | fzf --prompt="workstate > " --height=40% --reverse
@@ -30,9 +37,9 @@ pick_state() {
   fi
 
   PS3="Select workstate: "
-  select choice in wip review feedback blocked done; do
+  select choice in wip review feedback fixing-ci exploring blocked done clear; do
     case "$choice" in
-      wip|review|feedback|blocked|done)
+      wip|review|feedback|fixing-ci|exploring|blocked|done|clear)
         printf "%s\n" "$choice"
         return
         ;;
@@ -47,29 +54,32 @@ case "${1-}" in
   w) write_state "wip" ;;
   r) write_state "review" ;;
   f) write_state "feedback" ;;
+  c|ci) write_state "fixing-ci" ;;
+  e) write_state "exploring" ;;
   b) write_state "blocked" ;;
   d) write_state "done" ;;
-  wip|review|feedback|blocked|done) write_state "$1" ;;
+  x|clr) clear_state ;;
+  wip|review|feedback|fixing-ci|exploring|blocked|done) write_state "$1" ;;
   show)
     root=$(resolve_root)
     if [[ -f "$root/$state_file" ]]; then
       cat "$root/$state_file"
     fi
     ;;
-  clear)
-    root=$(resolve_root)
-    rm -f "$root/$state_file"
-    printf "Cleared %s\n" "$root/$state_file"
-    ;;
+  clear) clear_state ;;
   "")
     picked=$(pick_state || true)
     if [[ -z "$picked" ]]; then
       exit 1
     fi
+    if [[ "$picked" == "clear" ]]; then
+      clear_state
+      exit 0
+    fi
     write_state "$picked"
     ;;
   *)
-    printf "Usage: ws [w|r|f|b|d|wip|review|feedback|blocked|done|show|clear]\n" >&2
+    printf "Usage: ws [w|r|f|c|e|b|d|x|clr|wip|review|feedback|fixing-ci|exploring|blocked|done|show|clear]\n" >&2
     exit 1
     ;;
 esac
