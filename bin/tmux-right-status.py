@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -71,11 +72,11 @@ def git_segment(path: str) -> str:
                 if line[1] != " ":
                     has_unstaged = True
 
-        if has_staged and (has_unstaged or has_untracked):
+        if has_staged and has_unstaged:
             dirty = " #[fg=#2ac3de]●#[fg=#e0af68]"
         elif has_staged:
             dirty = " #[fg=#9ece6a]●#[fg=#e0af68]"
-        elif has_unstaged or has_untracked:
+        elif has_unstaged:
             dirty = " #[fg=#f7768e]●#[fg=#e0af68]"
 
         if has_untracked:
@@ -148,8 +149,6 @@ def battery_segment() -> str:
         
         # Parse pmset output for percentage and charging state
         # Example: "Now drawing from 'Battery Power' -InternalBattery-0 85%; discharging"
-        import re
-        
         # Extract percentage
         pct_match = re.search(r'(\d+)%', result)
         pct = int(pct_match.group(1)) if pct_match else 0
@@ -182,6 +181,14 @@ def cpu_memory_segment() -> str:
     """Get CPU and memory usage."""
     cpu_pct = 0
     mem_pct = 0
+
+    inactive_style = run(["tmux", "show-option", "-gv", "window-status-style"])
+    fg_match = re.search(r"(?:^|,)fg=([^,]+)", inactive_style)
+    inactive_fg_style = "#[default]"
+    if fg_match:
+        inactive_fg = fg_match.group(1).strip()
+        if inactive_fg != "default":
+            inactive_fg_style = f"#[fg={inactive_fg}]"
     
     try:
         # Get CPU usage - sample once, wait 0.5s, sample again
@@ -196,7 +203,6 @@ def cpu_memory_segment() -> str:
         
         if cpu_line:
             # Parse: "CPU usage: 15.23% user, 5.12% sys, 79.65% idle"
-            import re
             user_match = re.search(r'(\d+\.?\d*)%\s+user', cpu_line)
             sys_match = re.search(r'(\d+\.?\d*)%\s+sys', cpu_line)
             if user_match and sys_match:
@@ -211,8 +217,6 @@ def cpu_memory_segment() -> str:
         # Activity Monitor shows: App Memory + Wired + Compressed (excluding cached)
         result = run(["vm_stat"])
         if result:
-            import re
-            
             # Parse vm_stat output
             page_size = 16384  # 16KB on Apple Silicon, 4KB on Intel
             
@@ -247,8 +251,8 @@ def cpu_memory_segment() -> str:
     cpu_color = None if cpu_pct <= 75 else "#e0af68" if cpu_pct <= 90 else "#f7768e"
     mem_color = None if mem_pct <= 70 else "#e0af68" if mem_pct <= 85 else "#f7768e"
 
-    cpu_part = f"#[default]󰻠 {cpu_pct:02d}%" if cpu_color is None else f"#[fg={cpu_color}]󰻠 {cpu_pct:02d}%"
-    mem_part = f"#[default]󰍜 {mem_pct:02d}%" if mem_color is None else f"#[fg={mem_color}]󰍜 {mem_pct:02d}%"
+    cpu_part = f"{inactive_fg_style}󰻠 {cpu_pct:02d}%" if cpu_color is None else f"#[fg={cpu_color}]󰻠 {cpu_pct:02d}%"
+    mem_part = f"{inactive_fg_style}󰍜 {mem_pct:02d}%" if mem_color is None else f"#[fg={mem_color}]󰍜 {mem_pct:02d}%"
 
     return f"{cpu_part} {mem_part}"
 

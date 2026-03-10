@@ -15,7 +15,6 @@ new_window	󰐘  New Window
 split_vertical	󰤼  Split Vertical
 split_horizontal	󰤻  Split Horizontal
 zoom	󰓚  Zoom Toggle
-zen	󰒓  Zen Mode Toggle
 scratch	󰩹  Scratch Toggle
 resize_mode	󰩨  Enter Resize Mode
 copy_mode	󰆏  Enter Copy Mode
@@ -42,7 +41,6 @@ case "$action" in
   split_vertical) tmux split-window -h -c "#{pane_current_path}" ;;
   split_horizontal) tmux split-window -v -c "#{pane_current_path}" ;;
   zoom) tmux resize-pane -Z ;;
-  zen) tmux send-keys "C-a" "z" ;;
   scratch) tmux send-keys "C-a" "." ;;
   resize_mode) tmux switch-client -T resize ;;
   copy_mode) tmux copy-mode ;;

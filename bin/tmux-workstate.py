@@ -13,6 +13,7 @@ STATES = {
     "fixing-ci": ("󰙨", "#ff5f87"),
     "exploring": ("󱗖", "#9ece6a"),
     "blocked": ("󰜺", "#e0af68"),
+    "post-deploy": ("", "#e0af68"),
     "done": ("󰄬", "#2da44e"),
 }
 

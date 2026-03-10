@@ -29,7 +29,7 @@ clear_state() {
 
 pick_state() {
   local options
-  options=$'wip\nreview\nfeedback\nfixing-ci\nexploring\nblocked\ndone\nclear'
+  options=$'wip\nreview\nfeedback\nfixing-ci\nexploring\nblocked\npost-deploy\ndone\nclear'
 
   if command -v fzf >/dev/null 2>&1; then
     printf "%s\n" "$options" | fzf --prompt="workstate > " --height=40% --reverse
@@ -37,9 +37,9 @@ pick_state() {
   fi
 
   PS3="Select workstate: "
-  select choice in wip review feedback fixing-ci exploring blocked done clear; do
+  select choice in wip review feedback fixing-ci exploring blocked post-deploy done clear; do
     case "$choice" in
-      wip|review|feedback|fixing-ci|exploring|blocked|done|clear)
+      wip|review|feedback|fixing-ci|exploring|blocked|post-deploy|done|clear)
         printf "%s\n" "$choice"
         return
         ;;
@@ -57,9 +57,10 @@ case "${1-}" in
   c|ci) write_state "fixing-ci" ;;
   e) write_state "exploring" ;;
   b) write_state "blocked" ;;
+  p|pd) write_state "post-deploy" ;;
   d) write_state "done" ;;
   x|clr) clear_state ;;
-  wip|review|feedback|fixing-ci|exploring|blocked|done) write_state "$1" ;;
+  wip|review|feedback|fixing-ci|exploring|blocked|post-deploy|done) write_state "$1" ;;
   show)
     root=$(resolve_root)
     if [[ -f "$root/$state_file" ]]; then
@@ -79,7 +80,7 @@ case "${1-}" in
     write_state "$picked"
     ;;
   *)
-    printf "Usage: ws [w|r|f|c|e|b|d|x|clr|wip|review|feedback|fixing-ci|exploring|blocked|done|show|clear]\n" >&2
+    printf "Usage: ws [w|r|f|c|e|b|p|pd|d|x|clr|wip|review|feedback|fixing-ci|exploring|blocked|post-deploy|done|show|clear]\n" >&2
     exit 1
     ;;
 esac
