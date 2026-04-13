@@ -12,6 +12,11 @@ from pathlib import Path
 CACHE_FILE = Path("/tmp/tmux-status-cache.json")
 CACHE_TTL = 3  # seconds for most data
 SYS_CACHE_TTL = 5  # seconds for system stats (battery, cpu, memory)
+MEETING_SOON_MINUTES = 30
+MEETING_URGENT_MINUTES = 10
+MEETING_ALERT_BG = "#f7768e"
+MEETING_ALERT_BG_CURRENT = "#f05a76"
+MEETING_ALERT_FG = "#1f2335"
 
 
 def load_cache(ttl: int = CACHE_TTL) -> dict | None:
@@ -41,16 +46,145 @@ def run(cmd: list[str]) -> str:
         return ""
 
 
-def git_segment(path: str) -> str:
+def run_quiet(cmd: list[str]) -> bool:
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return result.returncode == 0
+    except Exception:
+        return False
+
+
+def truncate_text(text: str, max_len: int) -> str:
+    if len(text) <= max_len:
+        return text
+    if max_len <= 3:
+        return text[:max_len]
+    return text[: max_len - 3] + "..."
+
+
+def next_meeting() -> dict | None:
+    raw = run([str(Path.home() / "bin" / "cal_next"), "--raw"])
+    if not raw or raw == "NONE":
+        return None
+
+    parts = raw.split("\t", 1)
+    if len(parts) != 2:
+        return None
+
+    try:
+        start_ts = int(parts[0])
+    except ValueError:
+        return None
+
+    now_ts = int(time.time())
+    if start_ts < now_ts:
+        return None
+
+    title = parts[1].strip() or "(No title)"
+    minutes_until = int((start_ts - now_ts + 59) // 60)
+    return {"title": title, "minutes_until": minutes_until}
+
+
+def option_cache_name(option_name: str) -> str:
+    return "@meeting_prev_" + option_name.replace("@", "").replace("-", "_")
+
+
+def save_option_for_restore(option_name: str) -> None:
+    value = run(["tmux", "show-option", "-gv", option_name])
+    run_quiet(["tmux", "set-option", "-gq", option_cache_name(option_name), value])
+
+
+def restore_option(option_name: str) -> None:
+    cached = run(["tmux", "show-option", "-gv", option_cache_name(option_name)])
+    if cached:
+        run_quiet(["tmux", "set-option", "-gq", option_name, cached])
+
+
+def apply_meeting_alert_style(is_urgent: bool) -> None:
+    active = run(["tmux", "show-option", "-gv", "@meeting_alert"]) == "1"
+
+    if is_urgent and not active:
+        for option_name in [
+            "@status_bg",
+            "@status_fg",
+            "status-style",
+            "status-left-style",
+            "status-right-style",
+            "window-status-format",
+            "window-status-current-format",
+            "window-status-activity-style",
+            "window-status-bell-style",
+        ]:
+            save_option_for_restore(option_name)
+
+        run_quiet(["tmux", "set-option", "-gq", "@status_bg", MEETING_ALERT_BG])
+        run_quiet(["tmux", "set-option", "-gq", "@status_fg", MEETING_ALERT_FG])
+        run_quiet(["tmux", "set-option", "-gq", "@meeting_alert", "1"])
+        run_quiet(["tmux", "set-option", "-gq", "status-style", f"bg={MEETING_ALERT_BG},fg={MEETING_ALERT_FG}"])
+        run_quiet(["tmux", "set-option", "-gq", "status-left-style", f"bg={MEETING_ALERT_BG},fg={MEETING_ALERT_FG}"])
+        run_quiet(["tmux", "set-option", "-gq", "status-right-style", f"bg={MEETING_ALERT_BG},fg={MEETING_ALERT_FG}"])
+        run_quiet([
+            "tmux",
+            "set-option",
+            "-gq",
+            "window-status-format",
+            '#[fg=#{@status_bg},bg=#{@status_bg}]#[fg=#{@status_fg},bg=#{@status_bg}]#($HOME/bin/tmux-workstate.py "#{pane_current_path}" "#{@status_fg}" "#{window_activity_flag}" "#{window_bell_flag}") #I:#(basename "#{pane_current_path}" | sed -E "s/^fleet(io)?-//" | cut -c1-15)#[fg=#{@status_bg},bg=#{@status_bg}]',
+        ])
+        run_quiet([
+            "tmux",
+            "set-option",
+            "-gq",
+            "window-status-current-format",
+            f'#[fg=#{{@status_bg}},bg={MEETING_ALERT_BG_CURRENT},bold]#[fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG_CURRENT},bold] #I:#(basename "#{{pane_current_path}}" | sed -E "s/^fleet(io)?-//" | cut -c1-15)#[fg={MEETING_ALERT_BG_CURRENT},bg=#{{@status_bg}},nobold]',
+        ])
+        run_quiet(["tmux", "set-option", "-gq", "window-status-activity-style", f"fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG},bold"])
+        run_quiet(["tmux", "set-option", "-gq", "window-status-bell-style", f"fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG_CURRENT},bold"])
+        return
+
+    if not is_urgent and active:
+        for option_name in [
+            "@status_bg",
+            "@status_fg",
+            "status-style",
+            "status-left-style",
+            "status-right-style",
+            "window-status-format",
+            "window-status-current-format",
+            "window-status-activity-style",
+            "window-status-bell-style",
+        ]:
+            restore_option(option_name)
+
+        run_quiet(["tmux", "set-option", "-gq", "@meeting_alert", "0"])
+
+
+def meeting_branch_label(meeting: dict | None) -> str | None:
+    if not meeting:
+        return None
+
+    minutes_until = int(meeting.get("minutes_until", 9999))
+    if minutes_until > MEETING_SOON_MINUTES:
+        return None
+
+    title = truncate_text(meeting.get("title", "(No title)"), 18)
+    countdown = "now" if minutes_until <= 0 else f"{minutes_until}m"
+    return f"󰃰 {title} {countdown}"
+
+
+def git_segment(path: str, meeting: dict | None = None) -> str:
+    meeting_label = meeting_branch_label(meeting)
+
     if not path:
-        return " -"
+        return f" {meeting_label}" if meeting_label else " -"
 
     if run(["git", "-C", path, "rev-parse", "--is-inside-work-tree"]) != "true":
-        return " -"
+        return f" {meeting_label}" if meeting_label else " -"
 
     branch = run(["git", "-C", path, "symbolic-ref", "--short", "HEAD"])
     if not branch:
         branch = run(["git", "-C", path, "rev-parse", "--short", "HEAD"])
+
+    display_branch = meeting_label if meeting_label else branch
 
     porcelain = run(["git", "-C", path, "status", "--porcelain"])
     dirty = ""
@@ -104,7 +238,7 @@ def git_segment(path: str) -> str:
 
     status = f"{dirty}{untracked}{sync}"
     separator = " #[fg=#414868]│#[fg=#e0af68]" if status else ""
-    return f" {branch}{separator}{status}"
+    return f" {display_branch}{separator}{status}"
 
 
 def count_active_processes() -> dict[str, int]:
@@ -319,6 +453,9 @@ def compact_path(path: str) -> str:
 
 def main() -> int:
     pane_path = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
+    meeting = next_meeting()
+    urgent_meeting = bool(meeting and meeting.get("minutes_until", 9999) <= MEETING_URGENT_MINUTES)
+    apply_meeting_alert_style(urgent_meeting)
     
     # Try cache first (use fast TTL for git/path, slow TTL for system stats)
     cached = load_cache(CACHE_TTL)
@@ -340,7 +477,7 @@ def main() -> int:
         return 0
     
     # Compute git/path data
-    git = git_segment(pane_path)
+    git = git_segment(pane_path, meeting)
     process_counts = count_active_processes()
     
     battery = battery_segment()
@@ -362,7 +499,7 @@ def main() -> int:
     output_parts.append(f"#[fg=#414868]│ #[fg=#7aa2f7]🤖{openai_count} ")
     
     output = " ".join(output_parts)
-    
+
     # Save everything together
     save_cache({
         "path": pane_path, 
