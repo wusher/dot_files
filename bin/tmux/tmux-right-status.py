@@ -17,6 +17,15 @@ MEETING_URGENT_MINUTES = 10
 MEETING_ALERT_BG = "#f7768e"
 MEETING_ALERT_BG_CURRENT = "#f05a76"
 MEETING_ALERT_FG = "#1f2335"
+CYBERSYN_BIN = str(Path.home() / "bin" / "cybersyn")
+BASE_ENV = os.environ.copy()
+BASE_ENV["PATH"] = ":".join([
+    str(Path.home() / ".local/bin"),
+    str(Path.home() / "bin"),
+    "/opt/homebrew/bin",
+    "/usr/local/bin",
+    BASE_ENV.get("PATH", ""),
+])
 
 
 def load_cache(ttl: int = CACHE_TTL) -> dict | None:
@@ -41,14 +50,27 @@ def save_cache(data: dict) -> None:
 
 def run(cmd: list[str]) -> str:
     try:
-        return subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True).strip()
+        return subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True, env=BASE_ENV).strip()
+    except Exception:
+        return ""
+
+
+def run_in_dir(cmd: list[str], cwd: str) -> str:
+    try:
+        return subprocess.check_output(
+            cmd,
+            cwd=cwd,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            env=BASE_ENV,
+        ).strip()
     except Exception:
         return ""
 
 
 def run_quiet(cmd: list[str]) -> bool:
     try:
-        result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=BASE_ENV)
         return result.returncode == 0
     except Exception:
         return False
@@ -60,6 +82,12 @@ def truncate_text(text: str, max_len: int) -> str:
     if max_len <= 3:
         return text[:max_len]
     return text[: max_len - 3] + "..."
+
+
+def truncate_label(text: str, max_len: int = 15) -> str:
+    if len(text) <= max_len:
+        return text
+    return text[:max_len]
 
 
 def next_meeting() -> dict | None:
@@ -128,14 +156,14 @@ def apply_meeting_alert_style(is_urgent: bool) -> None:
             "set-option",
             "-gq",
             "window-status-format",
-            '#[fg=#{@status_bg},bg=#{@status_bg}]#[fg=#{@status_fg},bg=#{@status_bg}]#($HOME/bin/tmux-workstate.py "#{pane_current_path}" "#{@status_fg}" "#{window_activity_flag}" "#{window_bell_flag}") #I:#(basename "#{pane_current_path}" | sed -E "s/^fleet(io)?-//" | cut -c1-15)#[fg=#{@status_bg},bg=#{@status_bg}]',
+            '#[fg=#{@status_bg},bg=#{@status_bg}]#[fg=#{@status_fg},bg=#{@status_bg}]#($HOME/bin/tmux/tmux-workstate.py "#{pane_current_path}" "#{@status_fg}" "#{window_activity_flag}" "#{window_bell_flag}") #I:#(basename "#{pane_current_path}" | sed -E "s/^fleet(io)?-//; s/^WEB-[0-9]+-?//" | cut -c1-15)#[fg=#{@status_bg},bg=#{@status_bg}]',
         ])
         run_quiet([
             "tmux",
             "set-option",
             "-gq",
             "window-status-current-format",
-            f'#[fg=#{{@status_bg}},bg={MEETING_ALERT_BG_CURRENT},bold]#[fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG_CURRENT},bold] #I:#(basename "#{{pane_current_path}}" | sed -E "s/^fleet(io)?-//" | cut -c1-15)#[fg={MEETING_ALERT_BG_CURRENT},bg=#{{@status_bg}},nobold]',
+            f'#[fg=#{{@status_bg}},bg={MEETING_ALERT_BG_CURRENT},bold]#[fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG_CURRENT},bold] #I:#(basename "#{{pane_current_path}}" | sed -E "s/^fleet(io)?-//; s/^WEB-[0-9]+-?//" | cut -c1-15)#[fg={MEETING_ALERT_BG_CURRENT},bg=#{{@status_bg}},nobold]',
         ])
         run_quiet(["tmux", "set-option", "-gq", "window-status-activity-style", f"fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG},bold"])
         run_quiet(["tmux", "set-option", "-gq", "window-status-bell-style", f"fg={MEETING_ALERT_FG},bg={MEETING_ALERT_BG_CURRENT},bold"])
@@ -171,20 +199,20 @@ def meeting_branch_label(meeting: dict | None) -> str | None:
     return f"󰃰 {title} {countdown}"
 
 
-def git_segment(path: str, meeting: dict | None = None) -> str:
+def repo_segment(path: str, meeting: dict | None = None) -> str | None:
     meeting_label = meeting_branch_label(meeting)
 
     if not path:
-        return f" {meeting_label}" if meeting_label else " -"
+        return None
 
     if run(["git", "-C", path, "rev-parse", "--is-inside-work-tree"]) != "true":
-        return f" {meeting_label}" if meeting_label else " -"
+        return None
 
     branch = run(["git", "-C", path, "symbolic-ref", "--short", "HEAD"])
     if not branch:
         branch = run(["git", "-C", path, "rev-parse", "--short", "HEAD"])
 
-    display_branch = meeting_label if meeting_label else branch
+    display_branch = truncate_label(meeting_label if meeting_label else branch)
 
     porcelain = run(["git", "-C", path, "status", "--porcelain"])
     dirty = ""
@@ -239,6 +267,111 @@ def git_segment(path: str, meeting: dict | None = None) -> str:
     status = f"{dirty}{untracked}{sync}"
     separator = " #[fg=#414868]│#[fg=#e0af68]" if status else ""
     return f" {display_branch}{separator}{status}"
+
+
+def pending_pr_segment(path: str) -> str:
+    if not path:
+        return ""
+
+    raw_count = run([CYBERSYN_BIN, "--print-ready-review-count"])
+    if not raw_count:
+        return ""
+
+    count_match = re.search(r"(\d+)\s*$", raw_count)
+    if not count_match:
+        return ""
+
+    count = count_match.group(1)
+    return f"#[fg=#bb9af7] {count} "
+
+
+def cybersyn_segment() -> str:
+    raw = run([CYBERSYN_BIN, "--status"])
+    if not raw:
+        return ""
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return ""
+
+    running = int(data.get("running", 0))
+    asking = int(data.get("asking", 0))
+    idle = int(data.get("recent", 0))
+
+    return (
+        f"#[fg=#9ece6a]󰑮 {running} "
+        f"#[fg=#bb9af7]󰞋 {asking} "
+        f"#[fg=#e0af68]󰏤 {idle}"
+    )
+
+
+def update_countdown_segment() -> str:
+    raw = run([CYBERSYN_BIN, "--print-update-countdown"])
+    if not raw:
+        return ""
+
+    match = re.search(r"(\d+)", raw)
+    if not match:
+        return ""
+
+    seconds = int(match.group(1))
+
+    # over 60 -> minutes, under 60 -> seconds
+    if seconds > 60:
+        text = f"{seconds // 60}m"
+    else:
+        text = f"{seconds}s"
+
+    # red if 0, yellow if under 60, otherwise grey
+    if seconds == 0:
+        color = "#f7768e"
+    elif seconds < 60:
+        color = "#e0af68"
+    else:
+        color = "#565f89"
+
+    return f"#[fg={color}]󰎜 {text}"
+
+
+def usage_color(percent: int) -> str:
+    if percent < 50:
+        return "#9ece6a"
+    if percent < 75:
+        return "#e0af68"
+    if percent < 85:
+        return "#ff9e64"
+    return "#f7768e"
+
+
+def usage_segment() -> str:
+    raw = run([CYBERSYN_BIN, "--print-usage"])
+    if not raw:
+        return ""
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return ""
+
+    session_percent = int(data.get("sessionPercent", 0))
+    week_percent = int(data.get("weekPercent", 0))
+    session_resets_at = str(data.get("sessionResetsAt", ""))
+    week_resets_at = str(data.get("weekResetsAt", ""))
+
+    session_time_match = re.search(r"at ([0-9:]+[ap]m)", session_resets_at)
+    week_date_match = re.search(r"^([A-Z][a-z]{2} \d{1,2})", week_resets_at)
+    if not session_time_match or not week_date_match:
+        return ""
+
+    session_time = session_time_match.group(1)
+    week_date = week_date_match.group(1)
+
+    return (
+        f"#[fg={usage_color(session_percent)}]{session_percent}%·{session_time} "
+        f"#[fg=#7aa2f7]wk "
+        f"#[fg={usage_color(week_percent)}]{week_percent}%·{week_date}"
+    )
 
 
 def count_active_processes() -> dict[str, int]:
@@ -476,28 +609,44 @@ def main() -> int:
         print(cached["output"])
         return 0
     
-    # Compute git/path data
-    git = git_segment(pane_path, meeting)
+    # Compute repo/path data
+    repo = repo_segment(pane_path, meeting)
     process_counts = count_active_processes()
     
     battery = battery_segment()
     cpu_mem = cpu_memory_segment()
     
     output_parts = []
+
+    countdown = update_countdown_segment()
+    if countdown:
+        output_parts.append(countdown)
+
+    usage = usage_segment()
+    if usage:
+        # divider between countdown and usage
+        divider = "#[fg=#414868]│ " if countdown else ""
+        output_parts.append(f"{divider}{usage}")
+
+    codex_counts = cybersyn_segment()
+    if codex_counts:
+        # divider after usage
+        prefix = "#[fg=#414868]│ " if usage else ""
+        output_parts.append(f"{prefix}{codex_counts}")
     
-    # Path
-    output_parts.append(f"#[fg=#414868]│ #[fg=#9ece6a] {compact_path(pane_path)}")
-    
-    # Git
-    output_parts.append(f"#[fg=#414868]│ #[fg=#e0af68]{git}")
+    # Show the folder outside git repos, otherwise show repo state.
+    if repo:
+        output_parts.append(f"#[fg=#414868]│ #[fg=#e0af68]{repo}")
+    else:
+        output_parts.append(f"#[fg=#414868]│ #[fg=#9ece6a] {truncate_label(compact_path(pane_path))}")
     
     # CPU/Memory
     output_parts.append(f"#[fg=#414868]│ {cpu_mem}")
     
-    # AI process count
-    openai_count = process_counts["codex"] + process_counts["opencode"]
-    output_parts.append(f"#[fg=#414868]│ #[fg=#7aa2f7]🤖{openai_count} ")
-    
+    pending_prs = pending_pr_segment(pane_path)
+    if pending_prs:
+        output_parts.append(f"#[fg=#414868]│ {pending_prs}")
+
     output = " ".join(output_parts)
 
     # Save everything together

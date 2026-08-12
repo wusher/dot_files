@@ -6,7 +6,7 @@ session_name="$1"
 tmux has-session -t "$session_name" 2>/dev/null || exit 0
 
 case "$session_name" in
-  ghub)
+  cybersyn)
     tmux set-option -t "$session_name" status off
     ;;
   scrach|scratch)

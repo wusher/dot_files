@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Searchable tmux window switcher for prefix+space.
+# Searchable tmux session switcher for prefix+space.
 
 set -euo pipefail
 
@@ -21,6 +21,17 @@ truncate_text() {
   fi
 
   printf '%s...' "${text:0:max_len-3}"
+}
+
+format_activity() {
+  local epoch="$1"
+
+  if [[ -z "$epoch" ]]; then
+    printf '-'
+    return
+  fi
+
+  date -r "$epoch" '+%m-%d %H:%M' 2>/dev/null || printf '%s' "$epoch"
 }
 
 workstate_for_path() {
@@ -52,7 +63,7 @@ workstate_for_path() {
       icon="󱨎"; label="WIP"; color=$'\033[38;5;114m'
       ;;
     review)
-      icon="󰔟"; label="REVIEW"; color=$'\033[38;5;141m'
+      icon="󰔟"; label="REVIEW"; color=$'\033[38;5;201m'
       ;;
     feedback)
       icon="󰤉"; label="FEEDBACK"; color=$'\033[38;5;204m'
@@ -61,7 +72,7 @@ workstate_for_path() {
       icon="󰙨"; label="FIXING-CI"; color=$'\033[38;5;204m'
       ;;
     exploring)
-      icon="󱗖"; label="EXPLORING"; color=$'\033[38;5;114m'
+      icon="󱗖"; label="EXPLORING"; color=$'\033[38;5;73m'
       ;;
     blocked)
       icon="󰜺"; label="BLOCKED"; color=$'\033[38;5;179m'
@@ -81,14 +92,14 @@ workstate_for_path() {
 }
 
 if ! command -v fzf >/dev/null 2>&1; then
-  tmux choose-window
+  tmux choose-tree -s
   exit 0
 fi
 
-window_rows=$(tmux list-windows -F '#{window_id}	#{window_index}:#{window_name}	#{pane_current_path}')
+session_rows=$(tmux list-sessions -F '#{session_id}	#{session_name}	#{session_attached}	#{session_activity}')
 
 choices=""
-while IFS=$'\t' read -r window_id window_label pane_path; do
+while IFS=$'\t' read -r session_id session_name session_attached session_activity; do
   local_ws=""
   local_ws_icon=""
   local_ws_label=""
@@ -97,10 +108,23 @@ while IFS=$'\t' read -r window_id window_label pane_path; do
   local_ws_cell=""
   local_ws_display=""
   local_ws_icon_display=""
-  local_branch_short=""
-  local_branch_cell=""
-  local_window_cell=""
+  local_session_cell=""
+  local_panes_cell=""
+  local_activity_cell=""
+  local_attached_cell=""
   local_display_line=""
+  pane_rows=""
+  pane_count=""
+  pane_path=""
+  display_path=""
+  activity_display=""
+
+  pane_rows=$(tmux list-panes -t "$session_id" -F '#{window_active}	#{pane_active}	#{pane_current_path}')
+  pane_count=$(printf '%s\n' "$pane_rows" | wc -l | tr -d ' ')
+  pane_path=$(printf '%s\n' "$pane_rows" | awk -F '\t' '$1 == 1 && $2 == 1 { print $3; exit }')
+  if [[ -z "$pane_path" ]]; then
+    pane_path=$(printf '%s\n' "$pane_rows" | awk -F '\t' 'NR == 1 { print $3; exit }')
+  fi
 
   display_path="${pane_path/#$HOME/\~}"
   local_ws=$(workstate_for_path "$pane_path")
@@ -111,24 +135,28 @@ while IFS=$'\t' read -r window_id window_label pane_path; do
   local_ws_display="${local_ws_color}${local_ws_cell}${ansi_reset}"
   local_ws_icon_display="${local_ws_color}${local_ws_icon}${ansi_reset}"
 
-  branch="-"
-  if git -C "$pane_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    branch=$(git -C "$pane_path" symbolic-ref --quiet --short HEAD 2>/dev/null || git -C "$pane_path" rev-parse --short HEAD 2>/dev/null || printf -- '-')
+  activity_display=$(format_activity "$session_activity")
+
+  if [[ "$session_attached" != "0" ]]; then
+    attached_display='*'
+  else
+    attached_display=' '
   fi
-  local_branch_short=$(truncate_text "$branch" 40)
 
-  printf -v local_window_cell '%-18s' "$window_label"
-  printf -v local_branch_cell '%-40s' "$local_branch_short"
-  local_display_line="${local_window_cell} ${local_ws_display} ${local_branch_cell} ${display_path} ${local_ws_icon_display}"
+  printf -v local_session_cell '%-24s' "$(truncate_text "$session_name" 24)"
+  printf -v local_panes_cell '%5s' "$pane_count"
+  printf -v local_activity_cell '%-11s' "$activity_display"
+  printf -v local_attached_cell '%1s' "$attached_display"
+  local_display_line="${local_attached_cell} ${local_session_cell} ${local_panes_cell} ${local_activity_cell} ${local_ws_display} ${display_path} ${local_ws_icon_display}"
 
-  choices+="$window_id"
+  choices+="$session_id"
   choices+=$'\t'
   choices+="$local_display_line"
   choices+=$'\n'
-done <<< "$window_rows"
+done <<< "$session_rows"
 
 selection=$(printf '%s' "$choices" \
-  | fzf --prompt='window> ' \
+  | fzf --prompt='session> ' \
         --height=100% \
         --layout=reverse \
         --border=none \
@@ -143,4 +171,4 @@ selection=$(printf '%s' "$choices" \
 
 target=${selection%%$'\t'*}
 
-tmux select-window -t "$target"
+tmux switch-client -t "$target"
