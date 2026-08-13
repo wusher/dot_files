@@ -27,9 +27,9 @@ new_tab = ["prefix+n", "prefix+c"]
 # tmux jumps windows with alt+1..9 (no prefix)
 switch_tab = ["prefix+1..9", "alt+1..9"]
 
-# Spaces (workspaces): built-in picker. prefix+s is taken by the fzf picker
-# in [[keys.command]] below, so the built-in one keeps prefix+w only.
-workspace_picker = "prefix+w"
+# Spaces (workspaces): built-in picker on shift+S, since plain prefix+s is
+# taken by the fzf picker in [[keys.command]] below.
+workspace_picker = "prefix+shift+s"
 
 # Inside navigate mode, j/k walk spaces (arrows still work)
 navigate_workspace_down = ["down", "j"]
@@ -74,6 +74,16 @@ command = "/Users/wusher/mine/dot_files/herdr/plugins/agent-picker.rb"
 width = "80%"
 height = "60%"
 
+# cybersyn overlay, ported from tmux.conf bind G. The tmux binding wrapped it in
+# `new-session -A -s cybersyn` so the session survived being closed; herdr popups
+# run their command fresh every open, so keep the tmux wrapper to keep the state.
+[[keys.command]]
+key = "prefix+shift+g"
+type = "popup"
+command = "tmux new-session -A -s cybersyn cybersyn"
+width = "95%"
+height = "95%"
+
 [ui]
 # New tab opens straight away, no name prompt (tmux bind n behavior)
 prompt_new_tab_name = false
@@ -86,5 +96,39 @@ pane_borders = true
 
 agent_panel_sort = "spaces"
 [theme]
-name = "gruvbox"
+# herdr has no monokai built-in and no way to load a theme file, so this is a
+# dark base with all 16 overridable tokens replaced by monokai colors.
+# The base only shows through on colors herdr does not expose as tokens.
+#
+# WARNING: the settings UI (prefix+,) rewrites this file and drops the
+# [theme.custom] block below. Change the theme by editing this file, not there.
+name = "one-dark"
 auto_switch = false
+
+# Palette matches tmux/themes/monokai.conf so both look the same, plus the
+# standard monokai orange and purple that the tmux theme never needed.
+[theme.custom]
+# Backgrounds, darkest to lightest.
+panel_bg = "#161711"
+surface_dim = "#1e1f1c"
+surface0 = "#272822"
+surface1 = "#3e3d32"
+
+# Borders, dividers, and muted text.
+overlay0 = "#75715e"
+overlay1 = "#908f7d"
+
+# Foreground.
+text = "#f8f8f2"
+subtext0 = "#cfcfc2"
+
+# Green accent matches the active window colour in the tmux monokai theme.
+accent = "#a6e22e"
+
+green = "#a6e22e"
+yellow = "#e6db74"
+red = "#f92672"
+blue = "#66d9ef"
+teal = "#a1efe4"
+peach = "#fd971f"
+mauve = "#ae81ff"
